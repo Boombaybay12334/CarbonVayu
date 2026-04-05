@@ -19,7 +19,7 @@ function padToThirtySix(rows) {
   let nextRank = padded.length + 1;
 
   for (const name of EXTRA_NAMES) {
-    if (padded.length >= 36) break;
+    if (padded.length >= 28) break;
     padded.push({
       id: `extra-${name}`,
       rank: nextRank,
