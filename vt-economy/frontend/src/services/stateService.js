@@ -2,15 +2,11 @@ import { supabase } from "../lib/supabase";
 import { DUMMY_STATES, DUMMY_TIMESERIES, DUMMY_RELATIONS } from "../dummy/dummyData";
 
 export async function getStateByName(name) {
-  // TODO: Replace with Supabase query
-  // const { data, error } = await supabase
-  //   .from("states")
-  //   .select("*")
-  //   .eq("name", name)
-  //   .single();
-  // if (error) throw error;
-  // return data;
-  return DUMMY_STATES.find((state) => state.name === name) || DUMMY_STATES[6]; // DUMMY DATA - replace with Supabase query
+
+  const { data, error } = await supabase.from("states").select("*").eq("name", name).single();
+   if (error) throw error;
+   return data;
+  // return DUMMY_STATES.find((state) => state.name === name) || DUMMY_STATES[6]; // DUMMY DATA - replace with Supabase query
 }
 
 export async function getStateTimeseries(stateId, stateName) {
