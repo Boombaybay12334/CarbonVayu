@@ -27,35 +27,6 @@ function padToThirtySix(rows) {
   return padded;
 }
 
-// ✅ Animated number (safe, handles negatives, no NaN)
-function AnimatedNumber({ value }) {
-  const safeValue = Number(value) || 0;
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 800;
-    const stepTime = 20;
-    const steps = duration / stepTime;
-    const increment = safeValue / steps;
-
-    const timer = setInterval(() => {
-      start += increment;
-
-      if (Math.abs(start) >= Math.abs(safeValue)) {
-        setDisplay(safeValue);
-        clearInterval(timer);
-      } else {
-        setDisplay(Math.floor(start));
-      }
-    }, stepTime);
-
-    return () => clearInterval(timer);
-  }, [safeValue]);
-
-  return <span>{display}</span>;
-}
-
 export default function LeaderboardPage() {
   const [states, setStates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,15 +34,8 @@ export default function LeaderboardPage() {
   const [sortBy, setSortBy] = useState("rank");
   const [sortDir, setSortDir] = useState("asc");
 
-  // ✅ Slight delay so skeleton is visible (important for demo)
   useEffect(() => {
-    setLoading(true);
-
-    setTimeout(() => {
-      getAllStates()
-        .then((rows) => setStates(padToThirtySix(rows)))
-        .finally(() => setLoading(false));
-    }, 800);
+    getAllStates().then((rows) => setStates(padToThirtySix(rows)));
   }, []);
 
   const filtered = useMemo(() => {
@@ -89,9 +53,7 @@ export default function LeaderboardPage() {
     return [...rows].sort((a, b) => {
       const av = a[sortBy];
       const bv = b[sortBy];
-      if (typeof av === "number" && typeof bv === "number") {
-        return (av - bv) * factor;
-      }
+      if (typeof av === "number" && typeof bv === "number") return (av - bv) * factor;
       return String(av).localeCompare(String(bv)) * factor;
     });
   }, [search, sortBy, sortDir, states]);
@@ -135,48 +97,18 @@ export default function LeaderboardPage() {
           </thead>
 
           <tbody>
-            {loading ? (
-              // ✅ Skeleton loading rows
-              [...Array(6)].map((_, i) => (
-                <tr key={i} className="animate-pulse border-b border-slate-700/40">
-                  <td className="p-2"><div className="h-4 bg-slate-700 rounded w-6"></div></td>
-                  <td className="p-2"><div className="h-4 bg-slate-700 rounded w-24"></div></td>
-                  <td className="p-2"><div className="h-4 bg-slate-700 rounded w-20"></div></td>
-                  <td className="p-2"><div className="h-4 bg-slate-700 rounded w-16"></div></td>
-                  <td className="p-2"><div className="h-4 bg-slate-700 rounded w-28"></div></td>
-                </tr>
-              ))
-            ) : (
-              filtered.map((row) => {
-                const yoy = Number(row.yoy_delta) || 0;
-
-                return (
-                  <tr
-                    key={row.id}
-                    className="border-b border-slate-700/60 hover:bg-slate-700/40 transition"
-                  >
-                    <td className="p-2">{row.rank}</td>
-
-                    <td className="p-2">{row.name}</td>
-
-                    <td className="p-2">
-                      {Number(row.vt_balance).toLocaleString()}
-                    </td>
-
-                    {/* ✅ Animated YoY */}
-                    <td className={`p-2 ${yoy >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {yoy >= 0 ? "↑" : "↓"}{" "}
-                      {yoy >= 0 ? "+" : ""}
-                      <AnimatedNumber value={yoy} />
-                    </td>
-
-                    <td className="p-2 text-slate-300">
-                      {row.archetype}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
+            {filtered.map((row) => (
+              <tr key={row.id} className="border-b border-slate-700/60">
+                <td className="p-2">{row.rank}</td>
+                <td className="p-2">{row.name}</td>
+                <td className="p-2">{Number(row.vt_balance).toLocaleString()}</td>
+                <td className={`p-2 ${row.yoy_delta >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {row.yoy_delta >= 0 ? "↑" : "↓"} {row.yoy_delta >= 0 ? "+" : ""}
+                  {row.yoy_delta}
+                </td>
+                <td className="p-2 text-slate-300">{row.archetype}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
