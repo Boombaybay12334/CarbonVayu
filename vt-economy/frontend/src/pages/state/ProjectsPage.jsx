@@ -31,7 +31,7 @@ export default function ProjectsPage() {
     };
 
     await createProject(payload);
-    setMessage("Project submitted successfully (dummy response).");
+    setMessage("Project submitted successfully.");
     setForm({ title: "", description: "", vt_gain_estimate: "", funds_needed: "" });
   }
 
