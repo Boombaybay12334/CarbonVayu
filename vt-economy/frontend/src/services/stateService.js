@@ -14,15 +14,14 @@ export async function getStateByName(name) {
 }
 
 export async function getStateTimeseries(stateId, stateName) {
-  // TODO: Replace with Supabase query
-  // const { data, error } = await supabase
-  //   .from("vt_history")
-  //   .select("*")
-  //   .eq("state_id", stateId)
-  //   .order("year");
-  // if (error) throw error;
-  // return data;
-  return DUMMY_TIMESERIES[stateName] || DUMMY_TIMESERIES.Karnataka; // DUMMY DATA - replace with Supabase query
+   const { data, error } = await supabase
+     .from("vt_history")
+     .select("*")
+     .eq("state_id", stateId)
+     .order("year");
+   if (error) throw error;
+   return data;
+  // return DUMMY_TIMESERIES[stateName] || DUMMY_TIMESERIES.Karnataka; // DUMMY DATA - replace with Supabase query
 }
 
 export async function getStateRelations(stateId) {

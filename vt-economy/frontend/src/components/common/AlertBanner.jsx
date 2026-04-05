@@ -1,15 +1,20 @@
-const stylesByType = {
-  warning: "border-amber-500/70 bg-amber-500/10 text-amber-200",
-  info: "border-sky-500/70 bg-sky-500/10 text-sky-200",
-  success: "border-emerald-500/70 bg-emerald-500/10 text-emerald-200",
-};
+export default function AlertBanner({ type = "info", message }) {
+  const styles = {
+    warning: "bg-yellow-500/10 text-yellow-300 border-yellow-500/30",
+    info: "bg-blue-500/10 text-blue-300 border-blue-500/30",
+    success: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+  };
 
-export default function AlertBanner({ alert }) {
-  const style = stylesByType[alert?.type] ?? stylesByType.info;
+  const icons = {
+    warning: "⚠️",
+    info: "ℹ️",
+    success: "✅",
+  };
 
   return (
-    <div className={`border-l-4 rounded-md p-3 ${style}`}>
-      <p className="text-sm">{alert?.message}</p>
+    <div className={`flex items-center gap-3 p-3 rounded-lg border ${styles[type]}`}>
+      <span className="text-lg">{icons[type]}</span>
+      <p className="text-sm">{message}</p>
     </div>
   );
 }
