@@ -3,14 +3,14 @@ import { DUMMY_STATES, DUMMY_TIMESERIES, DUMMY_RELATIONS } from "../dummy/dummyD
 
 export async function getStateByName(name) {
   // TODO: Replace with Supabase query
-  // const { data, error } = await supabase
-  //   .from("states")
-  //   .select("*")
-  //   .eq("name", name)
-  //   .single();
-  // if (error) throw error;
-  // return data;
-  return DUMMY_STATES.find((state) => state.name === name) || DUMMY_STATES[6]; // DUMMY DATA - replace with Supabase query
+  const { data, error } = await supabase
+    .from("states")
+    .select("*")
+    .eq("name", name)
+    .single();
+  if (error) throw error;
+  return data;
+  //return DUMMY_STATES.find((state) => state.name === name) || DUMMY_STATES[6]; // DUMMY DATA - replace with Supabase query
 }
 
 export async function getStateTimeseries(stateId, stateName) {
@@ -25,15 +25,16 @@ export async function getStateTimeseries(stateId, stateName) {
   return DUMMY_TIMESERIES[stateName] || DUMMY_TIMESERIES.Karnataka; // DUMMY DATA - replace with Supabase query
 }
 
-export async function getStateRelations(stateId, stateName) {
+export async function getStateRelations(stateId) {
   // TODO: Replace with Supabase query
-  // const { data, error } = await supabase
-  //   .from("carbon_relations")
-  //   .select("*")
-  //   .or(`source_state_id.eq.${stateId},target_state_id.eq.${stateId}`);
-  // if (error) throw error;
-  // return data;
-  return DUMMY_RELATIONS[stateName] || DUMMY_RELATIONS.Karnataka; // DUMMY DATA - replace with Supabase query
+  const { data, error } = await supabase
+    .from("carbon_relations")
+    .select("*")
+    .or(`source_state_id.eq.${stateId},target_state_id.eq.${stateId}`);
+  if (error) throw error;
+  return data;
+  //we can also add stateName param and filter DUMMY_RELATIONS based on that instead of stateId, since the dummy data is keyed by stateName. But for real DB queries, we should use stateId.
+  // return DUMMY_RELATIONS[stateName] || DUMMY_RELATIONS.Karnataka; // DUMMY DATA - replace with Supabase query
 }
 
 export { supabase };
