@@ -54,7 +54,7 @@ export default function StateRelationsPage() {
     async function load() {
       if (!profile?.state_name) return;
       const state = await getStateByName(profile.state_name);
-      const rows = await getStateRelations(state?.id, profile.state_name);
+      const rows = await getStateRelations(state?.id);
       setRelations(rows || { affected_by: [], affecting: [] });
     }
 
