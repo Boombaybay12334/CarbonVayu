@@ -1,38 +1,33 @@
-// PAGE: StateHome
-
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import AlertBanner from "../../components/common/AlertBanner";
 import useAuth from "../../hooks/useAuth";
 import { getStateByName } from "../../services/stateService";
 
-// ✅ Animated Number
+// ✅ Animated VT number (smooth + guaranteed)
 function AnimatedNumber({ value }) {
-  const safeValue = Number(value) || 0;
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    setDisplay(0);
+    const end = Number(value) || 0;
+    let frame;
 
-    let start = 0;
+    const startTime = performance.now();
     const duration = 1000;
-    const stepTime = 20;
-    const steps = duration / stepTime;
-    const increment = safeValue / steps;
 
-    const timer = setInterval(() => {
-      start += increment;
+    function animate(time) {
+      const progress = Math.min((time - startTime) / duration, 1);
+      const current = Math.floor(progress * end);
+      setDisplay(current);
 
-      if (Math.abs(start) >= Math.abs(safeValue)) {
-        setDisplay(safeValue);
-        clearInterval(timer);
-      } else {
-        setDisplay(Math.floor(start));
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
       }
-    }, stepTime);
+    }
 
-    return () => clearInterval(timer);
-  }, [safeValue]);
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
 
   return <span>{display.toLocaleString()}</span>;
 }
@@ -73,7 +68,7 @@ export default function StateHome() {
       <aside className="rounded-xl shadow-md p-4 bg-slate-800 border border-slate-700">
         <p className="text-sm text-slate-400">Your VT Balance</p>
 
-        {/* ✅ Count animation */}
+        {/* ✅ Animated VT */}
         <h2 className="text-3xl font-bold mt-2">
           <AnimatedNumber
             key={withAlerts.vt_balance}
@@ -117,7 +112,7 @@ export default function StateHome() {
           <p>📐 Area: {Number(withAlerts.area_km2).toLocaleString()} km²</p>
         </div>
 
-        {/* ✅ Alerts */}
+        {/* ✅ Alerts with icons */}
         <div className="mt-5 space-y-3">
           {withAlerts.alerts.map((alert) => (
             <AlertBanner
