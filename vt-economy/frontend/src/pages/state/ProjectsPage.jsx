@@ -5,9 +5,11 @@
 // STATUS: Scaffold
 
 import { useEffect, useState } from "react";
+import useAuth from "../../hooks/useAuth";
 import { createProject, getProjects } from "../../services/projectsService";
 
 export default function ProjectsPage() {
+  const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState("browse");
   const [projects, setProjects] = useState([]);
   const [message, setMessage] = useState("");
@@ -24,14 +26,17 @@ export default function ProjectsPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
     const payload = {
       ...form,
       vt_gain_estimate: Number(form.vt_gain_estimate),
       funds_needed: Number(form.funds_needed),
+      state_id: profile?.state_id,
     };
 
-    await createProject(payload);
-    setMessage("Project submitted successfully (dummy response).");
+    const created = await createProject(payload);
+    setProjects((prev) => [created, ...prev]);
+    setMessage("Project submitted successfully.");
     setForm({ title: "", description: "", vt_gain_estimate: "", funds_needed: "" });
   }
 
