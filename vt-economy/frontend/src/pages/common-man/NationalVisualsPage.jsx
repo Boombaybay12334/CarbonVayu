@@ -6,7 +6,7 @@ import { getAllStates } from "../../services/leaderboardService";
 
 export default function NationalVisualsPage() {
   const [states, setStates] = useState([]);
-
+  const [filter, setFilter] = useState("all");
   useEffect(() => {
     getAllStates().then(setStates);
   }, []);
@@ -22,6 +22,27 @@ export default function NationalVisualsPage() {
     ],
     []
   );
+
+  const filteredStates = useMemo(() => {
+  if (!states || states.length === 0) return [];
+
+  const sorted = [...states].sort((a, b) => b.vt_score - a.vt_score);
+
+  if (filter === "top") return sorted.slice(0, 10);
+  if (filter === "bottom") return sorted.slice(-10);
+
+  return sorted;
+}, [states, filter]);
+
+
+
+  const avgVT =
+  states.reduce((sum, s) => sum + (s.vt_score || 0), 0) /
+  (states.length || 1);
+
+  const highestVT = Math.max(...states.map((s) => s.vt_score || 0));
+  const lowestVT = Math.min(...states.map((s) => s.vt_score || 0));
+  const deficitStates = states.filter((s) => (s.vt_score || 0) < 0).length;
 
   return (
     <div className="text-white max-w-6xl mx-auto px-4 space-y-10">
