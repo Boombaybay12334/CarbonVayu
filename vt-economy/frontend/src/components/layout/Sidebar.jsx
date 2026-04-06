@@ -1,88 +1,59 @@
-import { useMemo, useState } from "react";
-import { NavLink } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { Menu } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-function LinkItem({ to, label, disabled = false }) {
-  if (disabled) {
-    return (
-      <div
-        className="opacity-40 cursor-not-allowed rounded-lg px-3 py-2 text-sm text-slate-400"
-        title="Coming Soon"
-      >
-        {label}
-      </div>
-    );
-  }
+export default function Sidebar({ isOpen, setIsOpen }) {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        [
-          "rounded-lg px-3 py-2 text-sm transition-colors",
-          isActive ? "bg-emerald-600/20 text-emerald-400" : "text-slate-300 hover:bg-slate-800",
-        ].join(" ")
-      }
-    >
-      {label}
-    </NavLink>
-  );
-}
-
-export default function Sidebar() {
-  const { profile } = useAuth();
-  const [open, setOpen] = useState(true);
-
-  const role = profile?.role ?? "common_man";
-
-  const links = useMemo(() => {
-    if (role === "state") {
-      return [
-        { to: "/app/home", label: "Home" },
-        { to: "/app/national-visuals", label: "National Visuals" },
-        { to: "/app/state/relations", label: "State Relations" },
-        { to: "/app/projects", label: "Invest in Projects" },
-        { to: "#", label: "State-Level Tools", disabled: true },
-        { to: "#", label: "News", disabled: true },
-      ];
-    }
-
-    if (role === "admin") {
-      return [
-        { to: "/app/home", label: "Home" },
-        { to: "#", label: "National Visuals", disabled: true },
-        { to: "#", label: "State Relations", disabled: true },
-        { to: "#", label: "Invest in Projects", disabled: true },
-        { to: "#", label: "Model Controls", disabled: true },
-      ];
-    }
-
-    return [
-      { to: "/app/home", label: "Home" },
-      { to: "/app/explore", label: "How We Calculate VT" },
-      { to: "/app/national-visuals", label: "National Visuals" },
-      { to: "/app/leaderboard", label: "Leaderboard" },
-      { to: "#", label: "News", disabled: true },
-    ];
-  }, [role]);
+  const items = [
+    { name: "Home", path: "/app/home" },
+    { name: "Explore VT", path: "/app/explore" },
+    { name: "National Visuals", path: "/app/national-visuals" },
+    { name: "Leaderboard", path: "/app/leaderboard" },
+    { name: "Projects", path: "/app/projects" },
+  ];
 
   return (
-    <aside className="border-r border-slate-700 bg-slate-900/70 md:w-[220px] shrink-0">
+    <>
+      {/* Toggle */}
       <button
-        type="button"
-        onClick={() => setOpen((curr) => !curr)}
-        className="m-3 rounded-lg border border-slate-700 px-3 py-2 text-slate-200"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`fixed top-4 z-[100] bg-slate-800 p-2 rounded-lg border border-white/10 transition-all duration-300
+        ${isOpen ? "left-72" : "left-4"}`}
       >
-        ☰
+        <Menu size={20} />
       </button>
 
-      {open ? (
-        <nav className="px-3 pb-4 flex flex-col gap-2">
-          {links.map((link) => (
-            <LinkItem key={link.label} to={link.to} label={link.label} disabled={link.disabled} />
-          ))}
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-screen w-64 bg-slate-900 border-r border-white/10 p-5 z-40
+        transform transition-transform duration-300
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <h1 className="text-xl font-bold text-green-400 mb-8 mt-10">
+          VT Economy
+        </h1>
+
+        <nav className="space-y-3">
+          {items.map((item) => {
+            const isActive = location.pathname === item.path;
+
+            return (
+              <div
+                key={item.name}
+                onClick={() => navigate(item.path)}
+                className={`p-2 rounded-lg cursor-pointer transition ${
+                  isActive
+                    ? "bg-green-500/20 text-green-400"
+                    : "text-gray-300 hover:text-green-400 hover:bg-green-500/10"
+                }`}
+              >
+                {item.name}
+              </div>
+            );
+          })}
         </nav>
-      ) : null}
-    </aside>
+      </div>
+    </>
   );
 }
