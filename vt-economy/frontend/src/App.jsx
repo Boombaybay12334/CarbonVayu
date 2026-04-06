@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 
-// IMPORTANT: Keep route definitions centralized in this file.
 import LoadingSpinner from "./components/common/LoadingSpinner";
-import ProtectedRoute from "./components/layout/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
+
+import Navbar from "./components/layout/Navbar";
+
 import AdminHome from "./pages/admin/AdminHome";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
@@ -18,6 +19,7 @@ import StateHome from "./pages/state/StateHome";
 import StateRelationsPage from "./pages/state/StateRelationsPage";
 import StateTimeseriesPage from "./pages/state/StateTimeseriesPage";
 
+/* ROLE BASED HOME */
 function RoleHome() {
   const { profile } = useAuth();
 
@@ -27,6 +29,26 @@ function RoleHome() {
   return <CommonManHome />;
 }
 
+/* 🔥 NAVBAR LAYOUT */
+function AppLayout() {
+  const { user } = useAuth();
+
+  if (!user) return <Navigate to="/login" replace />;
+
+  return (
+    <div className="bg-slate-950 min-h-screen text-white">
+      
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Page Content */}
+      <div className="p-6">
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Routes>
@@ -34,7 +56,8 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      <Route path="/app" element={<ProtectedRoute />}>
+      {/* ALL APP ROUTES */}
+      <Route path="/app" element={<AppLayout />}>
         <Route path="home" element={<RoleHome />} />
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route path="explore" element={<ExploreVTPage />} />

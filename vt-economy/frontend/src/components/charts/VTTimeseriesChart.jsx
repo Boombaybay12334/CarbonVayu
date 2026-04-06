@@ -30,8 +30,8 @@ export default function VTTimeseriesChart({ data, title = "VT Timeseries", color
   return (
     <section className="rounded-xl shadow-md p-4 bg-slate-800 border border-slate-700">
       <h3 className="text-slate-100 font-semibold mb-4">{title}</h3>
-      <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-72 min-w-0">
+        <ResponsiveContainer width="100%" height="100%" minWidth={280} minHeight={220}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
             <XAxis dataKey="year" stroke="#94a3b8" />
