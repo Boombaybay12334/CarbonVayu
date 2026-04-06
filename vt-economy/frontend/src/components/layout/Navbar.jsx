@@ -24,8 +24,18 @@ export default function Navbar() {
             {initial}
           </button>
 
+          
           {open ? (
             <div className="absolute right-0 mt-2 w-40 rounded-lg border border-slate-700 bg-slate-800 p-2 shadow-lg">
+
+              {/* 👇 ADD THIS */}
+              <Link
+                to="/app/profile"
+                className="block rounded-md px-3 py-2 text-sm text-slate-100 hover:bg-slate-700"
+              >
+                Profile
+              </Link>
+
               <button
                 type="button"
                 onClick={logout}

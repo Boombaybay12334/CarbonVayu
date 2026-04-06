@@ -11,6 +11,7 @@ import CommonManHome from "./pages/common-man/CommonManHome";
 import ExploreVTPage from "./pages/common-man/ExploreVTPage";
 import LeaderboardPage from "./pages/common-man/LeaderboardPage";
 import NationalVisualsPage from "./pages/common-man/NationalVisualsPage";
+import ProfilePage from "./pages/shared/ProfilePage";
 import NotFoundPage from "./pages/shared/NotFoundPage";
 import ProjectsPage from "./pages/state/ProjectsPage";
 import StateHome from "./pages/state/StateHome";
@@ -41,8 +42,9 @@ export default function App() {
         <Route path="state/timeseries" element={<StateTimeseriesPage />} />
         <Route path="state/relations" element={<StateRelationsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
+        <Route path="/app/profile" element={<ProfilePage />} />
       </Route>
-
+      
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

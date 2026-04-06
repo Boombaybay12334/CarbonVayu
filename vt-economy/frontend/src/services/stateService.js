@@ -14,27 +14,47 @@ export async function getStateByName(name) {
 }
 
 export async function getStateTimeseries(stateId, stateName) {
-  // TODO: Replace with Supabase query
-  // const { data, error } = await supabase
-  //   .from("vt_history")
-  //   .select("*")
-  //   .eq("state_id", stateId)
-  //   .order("year");
-  // if (error) throw error;
-  // return data;
-  return DUMMY_TIMESERIES[stateName] || DUMMY_TIMESERIES.Karnataka; // DUMMY DATA - replace with Supabase query
+   const { data, error } = await supabase
+     .from("vt_history")
+     .select("*")
+     .eq("state_id", stateId)
+     .order("year");
+   if (error) throw error;
+   return data;
+  // return DUMMY_TIMESERIES[stateName] || DUMMY_TIMESERIES.Karnataka; // DUMMY DATA - replace with Supabase query
 }
 
 export async function getStateRelations(stateId) {
-  // TODO: Replace with Supabase query
   const { data, error } = await supabase
     .from("carbon_relations")
-    .select("*")
+    .select(`
+      *,
+      source_state:states!source_state_id(name),
+      target_state:states!target_state_id(name)
+    `)
     .or(`source_state_id.eq.${stateId},target_state_id.eq.${stateId}`);
+
   if (error) throw error;
-  return data;
-  //we can also add stateName param and filter DUMMY_RELATIONS based on that instead of stateId, since the dummy data is keyed by stateName. But for real DB queries, we should use stateId.
-  // return DUMMY_RELATIONS[stateName] || DUMMY_RELATIONS.Karnataka; // DUMMY DATA - replace with Supabase query
+
+  const affected_by = data
+    .filter((rel) => rel.target_state_id === stateId)
+    .map((rel) => ({
+      state: rel.source_state?.name || "Unknown",
+      type: rel.relation_type || "Unknown relation",
+      vt_impact: rel.vt_impact || 0,
+      status: rel.status || "neutral",
+    }));
+
+  const affecting = data
+    .filter((rel) => rel.source_state_id === stateId)
+    .map((rel) => ({
+      state: rel.target_state?.name || "Unknown",
+      type: rel.relation_type || "Unknown relation",
+      vt_impact: rel.vt_impact || 0,
+      status: rel.status || "neutral",
+    }));
+
+  return { affected_by, affecting };
 }
 
 export { supabase };

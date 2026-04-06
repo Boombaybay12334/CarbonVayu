@@ -36,6 +36,7 @@ export default function ProjectsPage() {
 
     const created = await createProject(payload);
     setProjects((prev) => [created, ...prev]);
+    await createProject(payload);
     setMessage("Project submitted successfully.");
     setForm({ title: "", description: "", vt_gain_estimate: "", funds_needed: "" });
   }
