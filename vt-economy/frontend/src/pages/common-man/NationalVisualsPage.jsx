@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CarbonFlowMap from "../../components/charts/CarbonFlowMap";
 import StateBarChart from "../../components/charts/StateBarChart";
 import { getAllStates } from "../../services/leaderboardService";
