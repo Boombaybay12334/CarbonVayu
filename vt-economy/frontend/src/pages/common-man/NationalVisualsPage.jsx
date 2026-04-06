@@ -1,9 +1,3 @@
-// PAGE: NationalVisualsPage
-// ROUTE: /app/national-visuals
-// ROLE: all
-// DATA SOURCE: leaderboardService (DUMMY)
-// STATUS: Scaffold
-
 import { useEffect, useMemo, useState } from "react";
 import CarbonFlowMap from "../../components/charts/CarbonFlowMap";
 import StateBarChart from "../../components/charts/StateBarChart";
@@ -17,7 +11,7 @@ export default function NationalVisualsPage() {
     getAllStates().then(setStates);
   }, []);
 
-  const aggregateDummyTimeseries = useMemo(
+  const data = useMemo(
     () => [
       { year: 2019, vt_score: 4600 },
       { year: 2020, vt_score: 4750 },
@@ -26,7 +20,7 @@ export default function NationalVisualsPage() {
       { year: 2023, vt_score: 5200 },
       { year: 2024, vt_score: 5410 },
     ],
-    [],
+    []
   );
 
   const filteredStates = useMemo(() => {
@@ -51,29 +45,32 @@ export default function NationalVisualsPage() {
   const deficitStates = states.filter((s) => (s.vt_score || 0) < 0).length;
 
   return (
-  <section className="space-y-5">
-    <VTTimeseriesChart data={aggregateDummyTimeseries} title="All-India VT Trend" />
+    <div className="text-white max-w-6xl mx-auto px-4 space-y-10">
 
-    
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-    <div className="bg-green-100 text-green-900 p-3 rounded shadow">Avg VT: {avgVT.toFixed(2)}</div>
-    <div className="bg-blue-100 text-blue-900 p-3 rounded shadow">Highest: {highestVT}</div>
-    <div className="bg-red-100 text-red-900 p-3 rounded shadow">Lowest: {lowestVT}</div>
-    <div className="bg-yellow-100 text-yellow-900 p-3 rounded shadow">Deficit: {deficitStates}</div>
-  </div>
+      {/* TOP CHART */}
+      <div className="bg-slate-800/60 p-5 rounded-xl border border-white/10 overflow-hidden">
+        <div className="w-full h-[320px]">
+          <VTTimeseriesChart data={data} />
+        </div>
+      </div>
 
-    <select
-      value={filter}
-      onChange={(e) => setFilter(e.target.value)}
-      className="border p-2 rounded bg-slate-900 text-slate-300"
-    >
-      <option value="all">All States</option>
-      <option value="top">Top 10</option>
-      <option value="bottom">Bottom 10</option>
-    </select>
+      {/* GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <StateBarChart data={filteredStates} title="State-by-State VT Ranking" />
-    <CarbonFlowMap />
-  </section>
-);
+        <div className="bg-slate-800/60 p-5 rounded-xl border border-white/10 overflow-hidden">
+          <div className="w-full h-[350px]">
+            <StateBarChart data={states} />
+          </div>
+        </div>
+
+        <div className="bg-slate-800/60 p-5 rounded-xl border border-white/10 overflow-hidden">
+          <div className="w-full h-[350px]">
+            <CarbonFlowMap />
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
 }
