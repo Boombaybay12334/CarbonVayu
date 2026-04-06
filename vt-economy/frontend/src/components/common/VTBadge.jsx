@@ -1,9 +1,13 @@
-export default function VTBadge({ score = 0, size = "md" }) {
+export default function VTBadge({ score = 0, size = "md", forceColor }) {
   const parsed = Number(score) || 0;
 
   let color = "bg-red-500";
-  if (parsed >= 7000) color = "bg-emerald-500";
-  else if (parsed >= 4000) color = "bg-amber-500";
+  if (parsed >= 500) color = "bg-emerald-500";
+  else if (parsed >= 200) color = "bg-amber-500";
+
+  if (forceColor) {
+    color = forceColor;
+  }
 
   const sizeClass = {
     sm: "text-xs px-2 py-0.5",

@@ -12,7 +12,6 @@ import CommonManHome from "./pages/common-man/CommonManHome";
 import ExploreVTPage from "./pages/common-man/ExploreVTPage";
 import LeaderboardPage from "./pages/common-man/LeaderboardPage";
 import NationalVisualsPage from "./pages/common-man/NationalVisualsPage";
-import ProfilePage from "./pages/shared/ProfilePage";
 import NotFoundPage from "./pages/shared/NotFoundPage";
 import ProjectsPage from "./pages/state/ProjectsPage";
 import StateHome from "./pages/state/StateHome";
@@ -36,13 +35,13 @@ function AppLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="bg-slate-950 min-h-screen text-white">
+    <div className="min-h-screen text-slate-200">
       
-      {/* Navbar */}
+      {/* Navbar - Fixed at top with glass effect */}
       <Navbar />
 
       {/* Page Content */}
-      <div className="p-6">
+      <div className="pt-24 p-6 max-w-7xl mx-auto animate-fade-in">
         <Outlet />
       </div>
     </div>
@@ -65,7 +64,6 @@ export default function App() {
         <Route path="state/timeseries" element={<StateTimeseriesPage />} />
         <Route path="state/relations" element={<StateRelationsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
-        <Route path="/app/profile" element={<ProfilePage />} />
       </Route>
       
       <Route path="*" element={<NotFoundPage />} />
