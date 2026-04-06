@@ -882,14 +882,15 @@ def print_completion(
 
 def main():
     base_dir = Path(__file__).resolve().parent
+    from ml_m2_m3 import xgb_compute_m2, xgb_compute_m3
 
     absorption_map, panel_df, emission_2022_map = load_inputs(base_dir)
 
-    M, confidence, diagonal_frac, own_emission_mt, exported_harm_mt, received_credit_mt, weight_winter, weight_summer = compute_m2(
+    M, confidence, diagonal_frac, own_emission_mt, exported_harm_mt, received_credit_mt, weight_winter, weight_summer = xgb_compute_m2(
         base_dir, emission_2022_map
     )
 
-    m3_df = compute_m3(absorption_map, panel_df, emission_2022_map)
+    m3_df = xgb_compute_m3(absorption_map, panel_df, emission_2022_map)
 
     vt_df = compute_vt(
         absorption_map,
