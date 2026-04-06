@@ -10,7 +10,7 @@ from scipy.stats import circstd
 
 STATES = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+    "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
     "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
     "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
     "Tamil Nadu", "Telangana", "Tripura", "Uttarakhand", "Uttar Pradesh",
@@ -20,6 +20,7 @@ STATES = [
 CENTROIDS = {
     "Andhra Pradesh": (15.9, 79.7), "Arunachal Pradesh": (28.2, 94.7),
     "Assam": (26.2, 92.9), "Bihar": (25.6, 85.1), "Chhattisgarh": (21.3, 81.7),
+    "Delhi": (28.6139, 77.2090),
     "Goa": (15.3, 74.0), "Gujarat": (22.3, 71.2), "Haryana": (29.1, 76.1),
     "Himachal Pradesh": (31.1, 77.2), "Jharkhand": (23.6, 85.3),
     "Karnataka": (15.3, 75.7), "Kerala": (10.8, 76.3), "Madhya Pradesh": (23.5, 78.7),
@@ -33,7 +34,7 @@ CENTROIDS = {
 
 STATE_AREA_KM2 = {
     "Andhra Pradesh": 162975, "Arunachal Pradesh": 83743, "Assam": 78438,
-    "Bihar": 94163, "Chhattisgarh": 135192, "Goa": 3702, "Gujarat": 196024,
+    "Bihar": 94163, "Chhattisgarh": 135192, "Delhi": 1484, "Goa": 3702, "Gujarat": 196024,
     "Haryana": 44212, "Himachal Pradesh": 55673, "Jharkhand": 79716,
     "Karnataka": 191791, "Kerala": 38852, "Madhya Pradesh": 308252,
     "Maharashtra": 307713, "Manipur": 22327, "Meghalaya": 22429,
@@ -46,7 +47,7 @@ STATE_AREA_KM2 = {
 TYPE_F = {"Arunachal Pradesh", "Meghalaya", "Mizoram", "Nagaland", "Manipur",
           "Tripura", "Sikkim", "Himachal Pradesh", "Uttarakhand", "Assam", "Goa"}
 TYPE_I = {"Maharashtra", "Gujarat", "Tamil Nadu", "Telangana", "Haryana",
-          "Jharkhand", "Punjab", "West Bengal", "Andhra Pradesh"}
+          "Jharkhand", "Punjab", "West Bengal", "Andhra Pradesh", "Delhi"}
 TYPE_M = set(STATES) - TYPE_F - TYPE_I
 
 RE_FRACTION = {
@@ -57,7 +58,8 @@ RE_FRACTION = {
     "Assam": 0.25, "Kerala": 0.55, "Goa": 0.20, "Maharashtra": 0.42,
     "Madhya Pradesh": 0.45, "Chhattisgarh": 0.22, "Odisha": 0.20,
     "Jharkhand": 0.12, "West Bengal": 0.18, "Uttar Pradesh": 0.32,
-    "Bihar": 0.15, "Punjab": 0.28, "Haryana": 0.30, "Telangana": 0.50
+    "Bihar": 0.15, "Punjab": 0.28, "Haryana": 0.30, "Telangana": 0.50,
+    "Delhi": 0.10
 }
 
 AQI_DELTA = {
@@ -68,7 +70,7 @@ AQI_DELTA = {
     "Telangana": -6, "Kerala": -15, "Assam": -5, "Himachal Pradesh": -18,
     "Uttarakhand": -12, "Arunachal Pradesh": -20, "Meghalaya": -18,
     "Manipur": -10, "Mizoram": -15, "Nagaland": -12, "Sikkim": -20,
-    "Tripura": -8, "Goa": -10
+    "Tripura": -8, "Goa": -10, "Delhi": 12
 }
 
 WEIGHTS = {
@@ -80,6 +82,8 @@ WEIGHTS = {
 KNOWN_CORRIDORS = [
     ("Punjab", "Haryana", [10, 11], 0.92),
     ("Punjab", "Uttar Pradesh", [10, 11], 0.92),
+    ("Haryana", "Delhi", [10, 11, 12, 1, 2], 0.90),
+    ("Delhi", "Uttar Pradesh", [10, 11, 12, 1, 2], 0.90),
     ("Haryana", "Uttar Pradesh", [10, 11, 12, 1, 2], 0.88),
     ("Jharkhand", "Odisha", list(range(1, 13)), 0.80),
     ("Jharkhand", "West Bengal", list(range(1, 13)), 0.80),
@@ -103,6 +107,68 @@ def archetype_for_state(state: str) -> str:
     return "M"
 
 
+STATE_ALIASES = {
+    "NCT of Delhi": "Delhi",
+    "National Capital Territory of Delhi": "Delhi",
+    "Delhi NCT": "Delhi",
+    "NCT Delhi": "Delhi",
+}
+
+
+def canonical_state_name(value) -> str:
+    if pd.isna(value):
+        return ""
+    state = str(value).strip()
+    return STATE_ALIASES.get(state, state)
+
+
+def canonicalize_state_column(df: pd.DataFrame, column_name: str = "state") -> pd.DataFrame:
+    df = df.copy()
+    df[column_name] = df[column_name].map(canonical_state_name)
+    return df
+
+
+def fill_panel_gaps(panel_df: pd.DataFrame) -> pd.DataFrame:
+    years = np.arange(2015, 2023, dtype=int)
+    full_index = pd.MultiIndex.from_product([STATES, years], names=["state", "year"])
+    panel_df = panel_df.set_index(["state", "year"]).reindex(full_index).reset_index()
+    panel_df["total_emission_mt"] = panel_df.groupby("state")["total_emission_mt"].transform(
+        lambda s: s.interpolate(limit_direction="both")
+    )
+    panel_df["total_emission_mt"] = panel_df["total_emission_mt"].fillna(0.0)
+    return panel_df
+
+
+def median_by_archetype(data_map):
+    if not data_map:
+        return {"F": 0.0, "I": 0.0, "M": 0.0}
+
+    global_median = float(np.median(list(data_map.values())))
+    medians = {}
+    for archetype in ["F", "I", "M"]:
+        vals = [
+            float(data_map[s])
+            for s in STATES
+            if s in data_map and archetype_for_state(s) == archetype
+        ]
+        medians[archetype] = float(np.median(vals)) if vals else global_median
+    return medians
+
+
+def get_re_fraction(state: str) -> float:
+    if state in RE_FRACTION:
+        return float(RE_FRACTION[state])
+    fallback = median_by_archetype(RE_FRACTION)
+    return float(fallback[archetype_for_state(state)])
+
+
+def get_aqi_delta(state: str) -> float:
+    if state in AQI_DELTA:
+        return float(AQI_DELTA[state])
+    fallback = median_by_archetype(AQI_DELTA)
+    return float(fallback[archetype_for_state(state)])
+
+
 def bearing_degrees(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
@@ -122,12 +188,53 @@ def load_inputs(base_dir: Path):
     panel_df = pd.read_csv(base_dir / "data" / "m1a" / "state_emissions_panel_2015_2022.csv")
     em2022_df = pd.read_csv(base_dir / "data" / "m1a" / "state_emissions_2022.csv")
 
+    absorption_df = canonicalize_state_column(absorption_df)
+    panel_df = canonicalize_state_column(panel_df)
+    em2022_df = canonicalize_state_column(em2022_df)
+
+    absorption_df = (
+        absorption_df.groupby("state", as_index=False)["absorption_mtco2_per_year"]
+        .mean()
+    )
+    panel_df["year"] = panel_df["year"].astype(int)
+    panel_df = (
+        panel_df.groupby(["state", "year"], as_index=False)["total_emission_mt"]
+        .sum()
+    )
+    em2022_df = (
+        em2022_df.groupby("state", as_index=False)["total_emission_mt"]
+        .sum()
+    )
+
     absorption_df = absorption_df[absorption_df["state"].isin(STATES)].copy()
     panel_df = panel_df[panel_df["state"].isin(STATES)].copy()
     em2022_df = em2022_df[em2022_df["state"].isin(STATES)].copy()
 
+    panel_df = fill_panel_gaps(panel_df)
+
     absorption_map = dict(zip(absorption_df["state"], absorption_df["absorption_mtco2_per_year"]))
-    emission_2022_map = dict(zip(em2022_df["state"], em2022_df["total_emission_mt"]))
+    archetype_absorption = median_by_archetype(absorption_map)
+    missing_absorption = [s for s in STATES if s not in absorption_map]
+    for state in missing_absorption:
+        absorption_map[state] = archetype_absorption[archetype_for_state(state)]
+
+    em2022_direct = dict(zip(em2022_df["state"], em2022_df["total_emission_mt"]))
+    em2022_panel = dict(
+        zip(
+            panel_df[panel_df["year"] == 2022]["state"],
+            panel_df[panel_df["year"] == 2022]["total_emission_mt"],
+        )
+    )
+    emission_2022_map = {}
+    for state in STATES:
+        emission_2022_map[state] = float(em2022_direct.get(state, em2022_panel.get(state, 0.0)))
+
+    if missing_absorption:
+        print("Imputed absorption for:", ", ".join(missing_absorption))
+
+    missing_em2022 = [s for s in STATES if emission_2022_map[s] <= 0]
+    if missing_em2022:
+        print("Warning: non-positive 2022 emissions for:", ", ".join(missing_em2022))
 
     return absorption_map, panel_df, emission_2022_map
 
@@ -297,9 +404,9 @@ def compute_m3(absorption_map, panel_df, emission_2022_map):
         else:
             s1 = 0.5
 
-        s2 = float(RE_FRACTION[state])
+        s2 = get_re_fraction(state)
         s3 = clip01(float(absorption_map[state]) / max_abs)
-        s4 = clip01(0.5 - (AQI_DELTA.get(state, 0) / 40.0))
+        s4 = clip01(0.5 - (get_aqi_delta(state) / 40.0))
         e_max_val = panel_df[panel_df["state"] == state]["total_emission_mt"].max()
         e_max_val = float(e_max_val) if pd.notna(e_max_val) and e_max_val > 0 else 1.0
         s5 = clip01(1.0 - (e2022 / (e_max_val * 1.05)))
@@ -403,6 +510,7 @@ def build_fine_claims(M, confidence):
     harm_threshold = float(np.percentile(off_diag_vals, 75)) if off_diag_vals else 0.0
     print(f"Dynamic fine threshold (P75): {harm_threshold:.6f} MT")
 
+    eligible_units_pool = []
     claims = []
     for i, src in enumerate(STATES):
         for j, dst in enumerate(STATES):
@@ -410,6 +518,8 @@ def build_fine_claims(M, confidence):
                 continue
             harm = float(M[i, j])
             conf = float(confidence[i, j])
+            if conf > 0.75 and harm > 0:
+                eligible_units_pool.append(harm * conf)
             if conf > 0.75 and harm > harm_threshold:
                 claims.append({
                     "defendant_state": src,
@@ -418,8 +528,41 @@ def build_fine_claims(M, confidence):
                     "confidence": conf,
                     "fine_vt_units": harm * conf,
                 })
-    columns = ["defendant_state", "claimant_state", "harm_mt", "confidence", "fine_vt_units"]
+
+    columns = [
+        "defendant_state",
+        "claimant_state",
+        "harm_mt",
+        "confidence",
+        "fine_vt_units",
+        "fine_vt_points",
+    ]
     claims_df = pd.DataFrame(claims, columns=columns)
+
+    if claims_df.empty:
+        return claims_df, harm_threshold
+
+    # Map fine units to a more interpretable points band [20, 150]
+    # using robust data-driven anchors from fine-eligible flows.
+    points_min = 20.0
+    points_max = 150.0
+    points_span = points_max - points_min
+
+    ref = np.asarray(
+        eligible_units_pool if eligible_units_pool else claims_df["fine_vt_units"].to_list(),
+        dtype=float,
+    )
+    p10 = float(np.percentile(ref, 10))
+    p90 = float(np.percentile(ref, 90))
+    if p90 - p10 <= 1e-12:
+        umin = float(np.min(ref))
+        umax = float(np.max(ref))
+        p10, p90 = umin, (umax if umax - umin > 1e-12 else umin + 1e-12)
+
+    claims_df["fine_vt_points"] = claims_df["fine_vt_units"].map(
+        lambda u: float(np.round(points_min + points_span * np.clip((float(u) - p10) / (p90 - p10), 0.0, 1.0), 1))
+    )
+
     return claims_df, harm_threshold
 
 
@@ -632,11 +775,9 @@ def print_completion(
         top_claims = claims_df.sort_values("harm_mt", ascending=False).head(10)
         print(top_claims.to_string(index=False))
 
-    delhi_proxy_area = 21400.0
-    delhi_proxy_diag = delhi_proxy_area / (delhi_proxy_area + 50000.0)
     print("\n4) M2 sanity diagonal fractions:")
     print(f"Goa: {diagonal_frac['Goa']:.4f} (~7%)")
-    print(f"Delhi proxy: {delhi_proxy_diag:.4f} (~30%)")
+    print(f"Delhi: {diagonal_frac['Delhi']:.4f} (~3%)")
     print(f"Madhya Pradesh: {diagonal_frac['Madhya Pradesh']:.4f} (~86%)")
     print(f"Rajasthan: {diagonal_frac['Rajasthan']:.4f} (~87%)")
 

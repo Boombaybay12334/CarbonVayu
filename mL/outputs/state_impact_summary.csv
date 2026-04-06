@@ -1,29 +1,30 @@
 state,total_exported_harm_mt,total_received_harm_mt,net_position_mt,system_role,top_victim_1,top_victim_1_mt,top_victim_1_conf,top_victim_2,top_victim_2_mt,top_victim_3,top_victim_3_mt,top_aggressor_1,top_aggressor_1_mt,top_aggressor_1_conf,top_aggressor_2,top_aggressor_2_mt,top_aggressor_3,top_aggressor_3_mt
-Andhra Pradesh,0.050633,0.033343,0.017289,net aggressor,Karnataka,0.015359,0.0,Goa,0.007556,Kerala,0.00577,Telangana,0.009893,0.0,Maharashtra,0.008218,Karnataka,0.005114
-Arunachal Pradesh,0.001768,0.019652,-0.017884,net victim,Assam,0.000458,0.65,Nagaland,0.000383,Meghalaya,0.000196,Assam,0.006014,0.65,West Bengal,0.002772,Odisha,0.001238
-Assam,0.02221,0.024016,-0.001805,net victim,Nagaland,0.009046,0.65,Arunachal Pradesh,0.006014,Meghalaya,0.003621,West Bengal,0.005513,0.0,Meghalaya,0.002764,Bihar,0.002181
-Bihar,0.040274,0.042162,-0.001888,net victim,West Bengal,0.007493,0.0,Sikkim,0.00604,Jharkhand,0.004656,Jharkhand,0.011311,0.0,Uttar Pradesh,0.009934,West Bengal,0.005804
-Chhattisgarh,0.069099,0.036337,0.032762,net aggressor,Odisha,0.022156,0.0,Jharkhand,0.010117,Telangana,0.005611,Madhya Pradesh,0.011653,0.65,Maharashtra,0.004777,Odisha,0.00461
-Goa,0.002229,0.053368,-0.051139,net victim,Karnataka,0.001568,0.0,Andhra Pradesh,0.000135,Kerala,0.000112,Karnataka,0.031507,0.0,Andhra Pradesh,0.007556,Maharashtra,0.003859
-Gujarat,0.063029,0.010626,0.052402,net aggressor,Maharashtra,0.009846,0.0,Madhya Pradesh,0.006921,Rajasthan,0.006034,Maharashtra,0.00499,0.0,Andhra Pradesh,0.001051,Telangana,0.000668
-Haryana,0.047176,0.028907,0.018269,net aggressor,Uttarakhand,0.010568,0.65,Uttar Pradesh,0.007788,Punjab,0.006845,Punjab,0.010531,0.92,Rajasthan,0.006098,Uttar Pradesh,0.003106
-Himachal Pradesh,0.011542,0.02966,-0.018118,net victim,Punjab,0.00497,0.0,Uttarakhand,0.00279,Haryana,0.001482,Punjab,0.018331,0.0,Uttar Pradesh,0.002258,Gujarat,0.001687
-Jharkhand,0.054134,0.046378,0.007756,net aggressor,West Bengal,0.020179,0.8,Bihar,0.011311,Tripura,0.00321,Chhattisgarh,0.010117,0.0,West Bengal,0.007038,Odisha,0.006953
-Karnataka,0.046773,0.035953,0.01082,net aggressor,Goa,0.031507,0.0,Andhra Pradesh,0.005114,Telangana,0.00296,Andhra Pradesh,0.015359,0.0,Telangana,0.005571,Maharashtra,0.005234
-Kerala,0.02311,0.117538,-0.094428,net victim,Tamil Nadu,0.022413,0.0,Andhra Pradesh,0.000171,Mizoram,7.7e-05,Tamil Nadu,0.105304,0.0,Andhra Pradesh,0.00577,Telangana,0.001466
-Madhya Pradesh,0.037677,0.02417,0.013506,net aggressor,Chhattisgarh,0.011653,0.65,Odisha,0.003354,Jharkhand,0.003164,Gujarat,0.006921,0.0,Haryana,0.003602,Maharashtra,0.003115
-Maharashtra,0.064165,0.024882,0.039282,net aggressor,Telangana,0.015208,0.77,Andhra Pradesh,0.008218,Karnataka,0.005234,Gujarat,0.009846,0.0,Telangana,0.003777,Andhra Pradesh,0.003222
-Manipur,0.002776,0.020615,-0.01784,net victim,Nagaland,0.001301,0.65,Assam,0.000733,Meghalaya,0.000278,West Bengal,0.004547,0.0,Odisha,0.002159,Bihar,0.001768
-Meghalaya,0.006771,0.034237,-0.027466,net victim,Assam,0.002764,0.0,Sikkim,0.000705,Manipur,0.00066,West Bengal,0.010414,0.0,Assam,0.003621,Bihar,0.003456
-Mizoram,0.001958,0.027073,-0.025115,net victim,Manipur,0.000772,0.65,Tripura,0.00033,Assam,0.000277,West Bengal,0.008314,0.0,Odisha,0.003197,Jharkhand,0.002471
-Nagaland,0.001709,0.026219,-0.02451,net victim,Arunachal Pradesh,0.000944,0.0,Manipur,0.000405,Assam,0.000116,Assam,0.009046,0.65,West Bengal,0.00352,Odisha,0.001661
-Odisha,0.056468,0.04504,0.011428,net aggressor,West Bengal,0.014695,0.0,Jharkhand,0.006953,Chhattisgarh,0.00461,Chhattisgarh,0.022156,0.0,Madhya Pradesh,0.003354,Telangana,0.002798
-Punjab,0.041365,0.01971,0.021655,net aggressor,Himachal Pradesh,0.018331,0.0,Haryana,0.010531,Uttarakhand,0.004328,Haryana,0.006845,0.65,Himachal Pradesh,0.00497,Gujarat,0.001789
-Rajasthan,0.025073,0.013894,0.011179,net aggressor,Haryana,0.006098,0.75,Madhya Pradesh,0.002766,Uttar Pradesh,0.002116,Gujarat,0.006034,0.0,Uttar Pradesh,0.001883,Maharashtra,0.001458
-Sikkim,0.001032,0.031654,-0.030622,net victim,Uttarakhand,0.000377,0.8,Himachal Pradesh,0.000261,Punjab,0.000188,West Bengal,0.008147,0.0,Bihar,0.00604,Uttar Pradesh,0.002973
-Tamil Nadu,0.12077,0.035932,0.084838,net aggressor,Kerala,0.105304,0.0,Karnataka,0.002517,Goa,0.002032,Kerala,0.022413,0.0,Andhra Pradesh,0.00522,Maharashtra,0.001871
-Telangana,0.039259,0.03778,0.001479,net aggressor,Andhra Pradesh,0.009893,0.0,Karnataka,0.005571,Maharashtra,0.003777,Maharashtra,0.015208,0.77,Chhattisgarh,0.005611,Andhra Pradesh,0.003942
-Tripura,0.003205,0.031804,-0.028598,net victim,Mizoram,0.001102,0.65,Meghalaya,0.000756,Manipur,0.000558,West Bengal,0.010915,0.0,Odisha,0.003711,Jharkhand,0.00321
-Uttarakhand,0.007097,0.031031,-0.023934,net victim,Haryana,0.001455,0.0,Himachal Pradesh,0.001302,Uttar Pradesh,0.000947,Haryana,0.010568,0.65,Uttar Pradesh,0.004828,Punjab,0.004328
-Uttar Pradesh,0.051697,0.025302,0.026395,net aggressor,Bihar,0.009934,0.76,Jharkhand,0.005779,Uttarakhand,0.004828,Haryana,0.007788,0.88,Gujarat,0.003107,Bihar,0.002494
-West Bengal,0.075458,0.061174,0.014284,net aggressor,Tripura,0.010915,0.0,Meghalaya,0.010414,Mizoram,0.008314,Jharkhand,0.020179,0.8,Odisha,0.014695,Bihar,0.007493
+Andhra Pradesh,0.050633,0.032589,0.018044,net aggressor,Karnataka,0.01533,0.0,Goa,0.007542,Kerala,0.005759,Telangana,0.009822,0.0,Maharashtra,0.008091,Karnataka,0.005109
+Arunachal Pradesh,0.001768,0.019051,-0.017283,net victim,Assam,0.000455,0.65,Nagaland,0.000381,Meghalaya,0.000195,Assam,0.005979,0.65,West Bengal,0.002754,Odisha,0.00123
+Assam,0.02221,0.023255,-0.001045,net victim,Nagaland,0.008992,0.65,Arunachal Pradesh,0.005979,Meghalaya,0.003599,West Bengal,0.005477,0.0,Meghalaya,0.002745,Bihar,0.002144
+Bihar,0.040274,0.039604,0.00067,balanced,West Bengal,0.007364,0.0,Sikkim,0.005936,Jharkhand,0.004576,Jharkhand,0.011213,0.0,Uttar Pradesh,0.009016,West Bengal,0.005766
+Chhattisgarh,0.069099,0.034523,0.034576,net aggressor,Odisha,0.022156,0.0,Jharkhand,0.010117,Telangana,0.005611,Madhya Pradesh,0.011555,0.65,Maharashtra,0.004702,Odisha,0.00458
+Delhi,0.01827,0.061342,-0.043072,net victim,Haryana,0.007397,0.65,Uttar Pradesh,0.002954,Madhya Pradesh,0.000972,Haryana,0.035599,0.9,Punjab,0.005383,Rajasthan,0.005148
+Goa,0.002229,0.052935,-0.050706,net victim,Karnataka,0.001568,0.0,Andhra Pradesh,0.000135,Kerala,0.000112,Karnataka,0.03148,0.0,Andhra Pradesh,0.007542,Maharashtra,0.003799
+Gujarat,0.063029,0.010283,0.052746,net aggressor,Maharashtra,0.009355,0.0,Madhya Pradesh,0.006576,Rajasthan,0.005733,Maharashtra,0.004913,0.0,Andhra Pradesh,0.001049,Telangana,0.000664
+Haryana,0.047176,0.032635,0.014541,net aggressor,Delhi,0.035599,0.9,Uttarakhand,0.002593,Uttar Pradesh,0.001911,Punjab,0.009161,0.92,Delhi,0.007397,Rajasthan,0.004846
+Himachal Pradesh,0.011542,0.025436,-0.013894,net victim,Punjab,0.004444,0.0,Uttarakhand,0.002495,Haryana,0.001325,Punjab,0.015945,0.0,Uttar Pradesh,0.002049,Gujarat,0.001603
+Jharkhand,0.054134,0.044437,0.009697,net aggressor,West Bengal,0.020004,0.8,Bihar,0.011213,Tripura,0.003182,Chhattisgarh,0.010117,0.0,West Bengal,0.006991,Odisha,0.006909
+Karnataka,0.046773,0.035441,0.011331,net aggressor,Goa,0.03148,0.0,Andhra Pradesh,0.005109,Telangana,0.002958,Andhra Pradesh,0.01533,0.0,Telangana,0.005531,Maharashtra,0.005152
+Kerala,0.02311,0.117292,-0.094182,net victim,Tamil Nadu,0.022413,0.0,Andhra Pradesh,0.000171,Mizoram,7.7e-05,Tamil Nadu,0.105304,0.0,Andhra Pradesh,0.005759,Telangana,0.001456
+Madhya Pradesh,0.037677,0.021122,0.016555,net aggressor,Chhattisgarh,0.011555,0.65,Odisha,0.003326,Jharkhand,0.003137,Gujarat,0.006576,0.0,Maharashtra,0.003066,Rajasthan,0.002198
+Maharashtra,0.064165,0.023712,0.040452,net aggressor,Telangana,0.014971,0.77,Andhra Pradesh,0.008091,Karnataka,0.005152,Gujarat,0.009355,0.0,Telangana,0.00375,Andhra Pradesh,0.003216
+Manipur,0.002776,0.019965,-0.017189,net victim,Nagaland,0.001298,0.65,Assam,0.000731,Meghalaya,0.000277,West Bengal,0.004517,0.0,Odisha,0.002145,Bihar,0.001737
+Meghalaya,0.006771,0.03328,-0.026509,net victim,Assam,0.002745,0.0,Sikkim,0.0007,Manipur,0.000655,West Bengal,0.010345,0.0,Assam,0.003599,Bihar,0.003397
+Mizoram,0.001958,0.026339,-0.024381,net victim,Manipur,0.000772,0.65,Tripura,0.000329,Assam,0.000276,West Bengal,0.00826,0.0,Odisha,0.003176,Jharkhand,0.002449
+Nagaland,0.001709,0.025566,-0.023857,net victim,Arunachal Pradesh,0.000944,0.0,Manipur,0.000405,Assam,0.000116,Assam,0.008992,0.65,West Bengal,0.003497,Odisha,0.00165
+Odisha,0.056468,0.043766,0.012703,net aggressor,West Bengal,0.014601,0.0,Jharkhand,0.006909,Chhattisgarh,0.00458,Chhattisgarh,0.022156,0.0,Madhya Pradesh,0.003326,Telangana,0.002778
+Punjab,0.041365,0.014167,0.027198,net aggressor,Himachal Pradesh,0.015945,0.0,Haryana,0.009161,Delhi,0.005383,Himachal Pradesh,0.004444,0.0,Gujarat,0.0017,Haryana,0.00168
+Rajasthan,0.025073,0.013645,0.011428,net aggressor,Delhi,0.005148,0.65,Haryana,0.004846,Madhya Pradesh,0.002198,Gujarat,0.005733,0.0,Uttar Pradesh,0.001709,Maharashtra,0.001436
+Sikkim,0.001032,0.030253,-0.029221,net victim,Uttarakhand,0.00036,0.8,Himachal Pradesh,0.00025,Punjab,0.00018,West Bengal,0.008093,0.0,Bihar,0.005936,Jharkhand,0.002727
+Tamil Nadu,0.12077,0.03563,0.08514,net aggressor,Kerala,0.105304,0.0,Karnataka,0.002517,Goa,0.002032,Kerala,0.022413,0.0,Andhra Pradesh,0.00521,Maharashtra,0.001842
+Telangana,0.039259,0.036699,0.00256,net aggressor,Andhra Pradesh,0.009822,0.0,Karnataka,0.005531,Maharashtra,0.00375,Maharashtra,0.014971,0.77,Chhattisgarh,0.005611,Andhra Pradesh,0.003934
+Tripura,0.003205,0.030941,-0.027736,net victim,Mizoram,0.001101,0.65,Meghalaya,0.000756,Manipur,0.000557,West Bengal,0.010843,0.0,Odisha,0.003687,Jharkhand,0.003182
+Uttarakhand,0.007097,0.021975,-0.014878,net victim,Delhi,0.002072,0.0,Haryana,0.00103,Himachal Pradesh,0.000922,Uttar Pradesh,0.004382,0.0,Punjab,0.003765,Haryana,0.002593
+Uttar Pradesh,0.051697,0.021174,0.030524,net aggressor,Bihar,0.009016,0.76,Jharkhand,0.005245,Delhi,0.004779,Delhi,0.002954,0.9,Gujarat,0.002952,Bihar,0.002451
+West Bengal,0.075458,0.059668,0.015789,net aggressor,Tripura,0.010843,0.0,Meghalaya,0.010345,Mizoram,0.00826,Jharkhand,0.020004,0.8,Odisha,0.014601,Bihar,0.007364
