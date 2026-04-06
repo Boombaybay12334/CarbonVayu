@@ -54,17 +54,17 @@ export default function NationalVisualsPage() {
         </div>
       </div>
 
-      {/* GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* CONTENT */}
+      <div className="grid grid-cols-1 gap-6">
 
         <div className="bg-slate-800/60 p-5 rounded-xl border border-white/10 overflow-hidden">
-          <div className="w-full h-[350px]">
+          <div className="w-full h-[420px]">
             <StateBarChart data={states} />
           </div>
         </div>
 
-        <div className="bg-slate-800/60 p-5 rounded-xl border border-white/10 overflow-hidden">
-          <div className="w-full h-[350px]">
+        <div className="bg-slate-800/60 p-5 rounded-xl border border-white/10">
+          <div className="w-full min-h-[680px]">
             <CarbonFlowMap />
           </div>
         </div>

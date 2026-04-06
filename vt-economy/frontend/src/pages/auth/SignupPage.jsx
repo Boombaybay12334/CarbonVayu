@@ -60,6 +60,7 @@ export default function SignupPage() {
         <label className="block mt-5 text-sm text-slate-300">Email</label>
         <input
           type="email"
+          autoComplete="username"
           className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -69,6 +70,7 @@ export default function SignupPage() {
         <label className="block mt-4 text-sm text-slate-300">Password</label>
         <input
           type="password"
+          autoComplete="new-password"
           className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
