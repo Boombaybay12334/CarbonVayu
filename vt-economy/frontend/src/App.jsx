@@ -20,9 +20,19 @@ import StateTimeseriesPage from "./pages/state/StateTimeseriesPage";
 
 /* ROLE BASED HOME */
 function RoleHome() {
-  const { profile } = useAuth();
+  const { profile, loading } = useAuth();
 
-  if (!profile) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner />;
+  if (!profile) {
+    return (
+      <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-6 text-amber-100">
+        <h1 className="text-xl font-semibold">We could not finish loading your profile</h1>
+        <p className="mt-2 text-sm text-amber-200/90">
+          This can happen right after account creation. Please refresh once. If it still appears, log out and sign in again.
+        </p>
+      </section>
+    );
+  }
   if (profile.role === "state") return <StateHome />;
   if (profile.role === "admin") return <AdminHome />;
   return <CommonManHome />;
