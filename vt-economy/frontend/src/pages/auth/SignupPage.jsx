@@ -32,13 +32,17 @@ export default function SignupPage() {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = cred.user;
 
-      const { error: profileError } = await supabase.from("user_profiles").insert({
+      const profilePayload = {
         firebase_uid: firebaseUser.uid,
         email,
         role,
         state_name: role === "state" ? stateName : null,
         state_id: role === "state" ? matchedStateId : null,
-      });
+      };
+
+      const { error: profileError } = await supabase
+        .from("user_profiles")
+        .upsert(profilePayload, { onConflict: "firebase_uid" });
 
       if (profileError) {
         throw profileError;
