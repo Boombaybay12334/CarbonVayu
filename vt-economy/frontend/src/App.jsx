@@ -12,7 +12,6 @@ import CommonManHome from "./pages/common-man/CommonManHome";
 import ExploreVTPage from "./pages/common-man/ExploreVTPage";
 import LeaderboardPage from "./pages/common-man/LeaderboardPage";
 import NationalVisualsPage from "./pages/common-man/NationalVisualsPage";
-import ProfilePage from "./pages/shared/ProfilePage";
 import NotFoundPage from "./pages/shared/NotFoundPage";
 import ProjectsPage from "./pages/state/ProjectsPage";
 import StateHome from "./pages/state/StateHome";
@@ -21,9 +20,19 @@ import StateTimeseriesPage from "./pages/state/StateTimeseriesPage";
 
 /* ROLE BASED HOME */
 function RoleHome() {
-  const { profile } = useAuth();
+  const { profile, loading } = useAuth();
 
-  if (!profile) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner />;
+  if (!profile) {
+    return (
+      <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-6 text-amber-100">
+        <h1 className="text-xl font-semibold">We could not finish loading your profile</h1>
+        <p className="mt-2 text-sm text-amber-200/90">
+          This can happen right after account creation. Please refresh once. If it still appears, log out and sign in again.
+        </p>
+      </section>
+    );
+  }
   if (profile.role === "state") return <StateHome />;
   if (profile.role === "admin") return <AdminHome />;
   return <CommonManHome />;
@@ -36,13 +45,13 @@ function AppLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="bg-slate-950 min-h-screen text-white">
+    <div className="min-h-screen text-slate-200">
       
-      {/* Navbar */}
+      {/* Navbar - Fixed at top with glass effect */}
       <Navbar />
 
       {/* Page Content */}
-      <div className="p-6">
+      <div className="pt-24 p-6 max-w-7xl mx-auto animate-fade-in">
         <Outlet />
       </div>
     </div>
@@ -65,7 +74,6 @@ export default function App() {
         <Route path="state/timeseries" element={<StateTimeseriesPage />} />
         <Route path="state/relations" element={<StateRelationsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
-        <Route path="/app/profile" element={<ProfilePage />} />
       </Route>
       
       <Route path="*" element={<NotFoundPage />} />

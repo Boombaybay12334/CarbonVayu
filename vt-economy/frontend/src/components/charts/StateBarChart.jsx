@@ -9,73 +9,44 @@ import {
   Cell,
 } from "recharts";
 
-/* 🔥 CUSTOM TOOLTIP (robust) */
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    const raw = payload[0]?.value;
-    const value = typeof raw === "number" && !isNaN(raw) ? raw.toFixed(2) : raw ?? "—";
-    return (
-      <div className="bg-slate-950 border border-slate-700 px-4 py-2 rounded-lg shadow-lg">
-        <p className="text-white font-medium">{label}</p>
-        <p className="text-blue-400 text-sm mt-1 font-semibold">{value} VT</p>
-      </div>
-    );
-  }
-  return null;
-};
+function getBarColor(score) {
+  if (score >= 500) return "#10b981"; // emerald-500
+  if (score >= 200) return "#f59e0b"; // amber-500
+  return "#ef4444"; // red-500
+}
 
-export default function StateBarChart({ data }) {
-  const sorted = [...(data || [])].sort(
-    (a, b) => (b?.vt_balance ?? 0) - (a?.vt_balance ?? 0)
-  );
-
-  const getColor = (value) => {
-    if (value >= 550) return "#22c55e"; // green
-    if (value >= 500) return "#facc15"; // yellow
-    return "#ef4444"; // red
-  };
+export default function StateBarChart({ data = [], title = "" }) {
+  // Render up to 29 states
+  const chartData = data.slice(0, 29);
+  
+  // Calculate a dynamic height so the chart stretches properly and is cleanly scrollable
+  const rowHeight = 34; // px per state row
+  const innerHeight = Math.max(chartData.length * rowHeight, 300); // at least 300px
 
   return (
-    <div className="h-[400px] overflow-y-auto pr-2">
-      
-      {/* Bigger inner height for 29 states */}
-      <div className="h-[900px]">
-
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={sorted}
-            layout="vertical"
-            margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-
-            {/* Y Axis (State Names) */}
-            <YAxis
-              dataKey="name"
-              type="category"
-              width={120}
-              tick={{ fill: "#cbd5f5", fontSize: 11 }}
-            />
-
-            {/* X Axis (Values) */}
-            <XAxis
-              type="number"
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
-            />
-
-            {/* 🔥 CUSTOM TOOLTIP */}
-            <Tooltip content={<CustomTooltip />} />
-
-            {/* Bars */}
-            <Bar dataKey="vt_balance" radius={[6, 6, 6, 6]}>
-              {sorted.map((entry, index) => (
-                <Cell key={index} fill={getColor(entry.vt_balance)} />
-              ))}
-            </Bar>
-
-          </BarChart>
-        </ResponsiveContainer>
-
+    <div className="w-full h-full flex flex-col">
+      {title && <h3 className="text-slate-100 font-semibold mb-4">{title}</h3>}
+      {/* Scrollable Container */}
+      <div style={{ maxHeight: 320 }} className="overflow-y-auto pr-2 custom-scrollbar">
+        {/* inner chart height sized by number of states; outer container stays small and scrollable */}
+        <div style={{ height: `${innerHeight}px` }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} layout="vertical" margin={{ left: 32, right: 16 }}>
+              <XAxis type="number" stroke="#94a3b8" />
+              <YAxis type="category" dataKey="name" width={120} stroke="#94a3b8" interval={0} tick={{ fontSize: 13 }} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155" }} 
+                itemStyle={{ color: "#3b82f6" }} // Force blue color on hover
+                cursor={{ fill: "rgba(255,255,255,0.05)" }}
+              />
+              <Bar dataKey="vt_balance" radius={[0, 6, 6, 0]} barSize={24}>
+                {chartData.map((entry) => (
+                  <Cell key={entry.id ?? entry.name} fill={getBarColor(entry.vt_balance)} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
