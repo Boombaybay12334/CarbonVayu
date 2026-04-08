@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { supabase } from "../lib/supabase";
@@ -36,10 +36,61 @@ async function fetchProfileWithRetry(firebaseUid) {
   return null;
 }
 
+async function ensureProfileExists(firebaseUser) {
+  const fallbackProfile = {
+    firebase_uid: firebaseUser.uid,
+    email: firebaseUser.email ?? "",
+    role: "common_man",
+    state_name: null,
+    state_id: null,
+  };
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .upsert(fallbackProfile, { onConflict: "firebase_uid", ignoreDuplicates: true });
+
+  if (error) {
+    throw error;
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const loadOrRecoverProfile = useCallback(async (firebaseUser) => {
+    const loadedProfile = await fetchProfileWithRetry(firebaseUser.uid);
+    if (loadedProfile) {
+      return loadedProfile;
+    }
+
+    // Self-heal legacy accounts that were created without a profile row.
+    await ensureProfileExists(firebaseUser);
+    return fetchProfileWithRetry(firebaseUser.uid);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser) {
+      setUser(null);
+      setProfile(null);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const loadedProfile = await loadOrRecoverProfile(firebaseUser);
+      setUser(firebaseUser);
+      setProfile(loadedProfile ?? null);
+    } catch (error) {
+      console.error("Failed to refresh user profile", error);
+      setUser(firebaseUser);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [loadOrRecoverProfile]);
 
   useEffect(() => {
     let isActive = true;
@@ -55,7 +106,7 @@ export function AuthProvider({ children }) {
 
       try {
         if (firebaseUser) {
-          const loadedProfile = await fetchProfileWithRetry(firebaseUser.uid);
+          const loadedProfile = await loadOrRecoverProfile(firebaseUser);
 
           if (isActive && requestId === latestRequestId) {
             setUser(firebaseUser);
@@ -84,12 +135,12 @@ export function AuthProvider({ children }) {
       isActive = false;
       unsub();
     };
-  }, []);
+  }, [loadOrRecoverProfile]);
 
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

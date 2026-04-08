@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 
 import LoadingSpinner from "./components/common/LoadingSpinner";
@@ -20,7 +21,13 @@ import StateTimeseriesPage from "./pages/state/StateTimeseriesPage";
 
 /* ROLE BASED HOME */
 function RoleHome() {
-  const { profile, loading } = useAuth();
+  const { profile, loading, refreshProfile } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !profile) {
+      refreshProfile();
+    }
+  }, [loading, profile, refreshProfile]);
 
   if (loading) return <LoadingSpinner />;
   if (!profile) {
@@ -28,8 +35,15 @@ function RoleHome() {
       <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-6 text-amber-100">
         <h1 className="text-xl font-semibold">We could not finish loading your profile</h1>
         <p className="mt-2 text-sm text-amber-200/90">
-          This can happen right after account creation. Please refresh once. If it still appears, log out and sign in again.
+          We are retrying automatically. If this still appears, use Retry Profile Load.
         </p>
+        <button
+          type="button"
+          onClick={refreshProfile}
+          className="mt-4 rounded-lg border border-amber-400/50 px-4 py-2 text-sm font-medium text-amber-100 hover:bg-amber-500/10"
+        >
+          Retry Profile Load
+        </button>
       </section>
     );
   }
