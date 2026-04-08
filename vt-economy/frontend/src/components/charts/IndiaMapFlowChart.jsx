@@ -37,6 +37,50 @@ function arcPath(sx, sy, tx, ty, sag = 0.25) {
   return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
 }
 
+function periodScore(period) {
+  const text = String(period ?? "").trim();
+  if (!text) return Number.NEGATIVE_INFINITY;
+
+  const parsedDate = Date.parse(text);
+  if (!Number.isNaN(parsedDate)) return parsedDate;
+
+  const numeric = Number(text.replace(/[^\d.-]/g, ""));
+  if (Number.isFinite(numeric)) return numeric;
+
+  return Number.NEGATIVE_INFINITY;
+}
+
+function selectLatestRelations(relations) {
+  const rows = Array.isArray(relations) ? relations : [];
+  const withPeriod = rows.filter((r) => String(r.period ?? "").trim() !== "");
+
+  if (!withPeriod.length) {
+    return { latestPeriod: null, latestRows: rows };
+  }
+
+  let latestPeriod = withPeriod[0].period;
+  for (const relation of withPeriod.slice(1)) {
+    const candidatePeriod = relation.period;
+    const candidateScore = periodScore(candidatePeriod);
+    const latestScore = periodScore(latestPeriod);
+
+    if (
+      candidateScore > latestScore ||
+      (candidateScore === latestScore &&
+        String(candidatePeriod).localeCompare(String(latestPeriod)) > 0)
+    ) {
+      latestPeriod = candidatePeriod;
+    }
+  }
+
+  return {
+    latestPeriod: String(latestPeriod),
+    latestRows: rows.filter(
+      (relation) => String(relation.period ?? "").trim() === String(latestPeriod),
+    ),
+  };
+}
+
 const INDIA_GEOJSON_SOURCES = [
   "/india_state.geojson",
   "https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson",
@@ -54,18 +98,58 @@ async function loadIndiaGeoJson() {
   throw new Error("Failed to load India map geometry from all sources.");
 }
 
-export default function IndiaMapFlowChart({ states: statesProp, relations: relationsProp }) {
+export default function IndiaMapFlowChart() {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
+  const refreshTimerRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, content: null });
   const [flowFilter, setFlowFilter] = useState("all"); // all | fine | transport
+  const [latestPeriodLabel, setLatestPeriodLabel] = useState("current");
+  const [refreshVersion, setRefreshVersion] = useState(0);
 
   // Keep animation frame ref for cleanup
   const animFrameRef = useRef(null);
   const arcSelRef = useRef(null);
+
+  useEffect(() => {
+    const queueRefresh = () => {
+      if (refreshTimerRef.current) return;
+      refreshTimerRef.current = setTimeout(() => {
+        refreshTimerRef.current = null;
+        setRefreshVersion((v) => v + 1);
+      }, 250);
+    };
+
+    const channel = supabase
+      .channel("india-map-flow-live")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "states" },
+        queueRefresh,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "carbon_relations" },
+        queueRefresh,
+      )
+      .subscribe();
+
+    const pollInterval = setInterval(() => {
+      setRefreshVersion((v) => v + 1);
+    }, 30000);
+
+    return () => {
+      clearInterval(pollInterval);
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,20 +163,25 @@ export default function IndiaMapFlowChart({ states: statesProp, relations: relat
         const indiaGeo = await loadIndiaGeoJson();
 
         // ── 2. Fetch state + relation data from supabase ──────────────────────
-        let states = statesProp;
-        let relations = relationsProp;
+        const [sr, rr] = await Promise.all([
+          supabase.from("states").select("id, name, vt_balance, archetype, rank"),
+          supabase
+            .from("carbon_relations")
+            .select("id, source_state_id, target_state_id, relation_type, vt_impact, status, period"),
+        ]);
+        if (sr.error) throw sr.error;
+        if (rr.error) throw rr.error;
 
-        if (!states) {
-          const [sr, rr] = await Promise.all([
-            supabase.from("states").select("id, name, vt_balance, archetype, rank"),
-            supabase
-              .from("carbon_relations")
-              .select("id, source_state_id, target_state_id, relation_type, vt_impact, status"),
-          ]);
-          if (sr.error) throw sr.error;
-          if (rr.error) throw rr.error;
-          states = sr.data || [];
-          relations = rr.data || [];
+        const states = sr.data || [];
+        const relations = rr.data || [];
+
+        const { latestPeriod, latestRows } = selectLatestRelations(relations);
+        if (!cancelled) {
+          setLatestPeriodLabel(latestPeriod || "current");
+        }
+
+        if (!states.length) {
+          throw new Error("No state records found in Supabase.");
         }
 
         if (cancelled) return;
@@ -126,14 +215,13 @@ export default function IndiaMapFlowChart({ states: statesProp, relations: relat
         // ── 6. Projection centred on India ─────────────────────────────────────
         const projection = d3
           .geoMercator()
-          .fitSize([W * 0.9, H * 0.9], indiaGeo)
-          .translate([W * 0.5, H * 0.5]);
+          .fitExtent([[24, 24], [W - 24, H - 24]], indiaGeo);
 
         const path = d3.geoPath().projection(projection);
 
         // ── 7. VT colour scale ─────────────────────────────────────────────────
         const vtValues = states.map((s) => Number(s.vt_balance) || 0);
-        const vtExtent = [Math.min(...vtValues), Math.max(...vtValues)];
+        const vtExtent = vtValues.length ? [Math.min(...vtValues), Math.max(...vtValues)] : [0, 0];
 
         // ── 8. Gradient defs ───────────────────────────────────────────────────
         const defs = svg.append("defs");
@@ -228,7 +316,7 @@ export default function IndiaMapFlowChart({ states: statesProp, relations: relat
         });
 
         // ── 11. Build flow arcs ────────────────────────────────────────────────
-        const filteredRelations = (relations || []).filter((r) => {
+        const filteredRelations = (latestRows || []).filter((r) => {
           if (flowFilter === "fine") return r.relation_type === "fine";
           if (flowFilter === "transport") return r.relation_type === "transport";
           return true;
@@ -356,8 +444,7 @@ export default function IndiaMapFlowChart({ states: statesProp, relations: relat
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       arcSelRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flowFilter]);
+  }, [flowFilter, refreshVersion]);
 
   return (
     <section className="rounded-xl shadow-md p-4 bg-slate-800 border border-slate-700 relative">
@@ -387,6 +474,10 @@ export default function IndiaMapFlowChart({ states: statesProp, relations: relat
             Transport
           </span>
           <span className="ml-2 text-slate-500">(state fill = VT balance)</span>
+        </div>
+
+        <div className="ml-auto text-[11px] text-emerald-300/90">
+          Live from DB | latest period: {latestPeriodLabel}
         </div>
       </div>
 
