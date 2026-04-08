@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import CarbonFlowMap from "../../components/charts/CarbonFlowMap";
+import IndiaMapFlowChart from "../../components/charts/IndiaMapFlowChart";
 import StateBarChart from "../../components/charts/StateBarChart";
 import { getAllStates } from "../../services/leaderboardService";
 
@@ -97,6 +98,23 @@ export default function NationalVisualsPage() {
         <div className="w-full h-[680px] rounded-xl overflow-hidden border border-white/5 bg-slate-900/50 backdrop-blur-sm">
           <CarbonFlowMap />
         </div>
+      </div>
+
+      {/* India Geographic Carbon Flow Map */}
+      <div className="glass-panel p-6 rounded-2xl animate-slide-up relative overflow-hidden" style={{ animationDelay: '0.5s' }}>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="text-2xl font-display font-semibold text-white flex items-center gap-2">
+              <span className="w-3 h-8 rounded-full bg-gradient-to-b from-emerald-400 to-teal-600 inline-block"></span>
+              Geographic Carbon Flow Map
+            </h3>
+            <p className="text-slate-400 text-sm mt-1 ml-5">
+              Real India map — state VT balance as colour heatmap with animated cross-border carbon flows.
+            </p>
+          </div>
+        </div>
+        <IndiaMapFlowChart />
       </div>
 
     </div>

@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { supabase } from "../../lib/supabase";
-import { DUMMY_STATES } from "../../dummy/dummyData";
 
 const INDIAN_STATES_AND_UTS = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
@@ -18,11 +17,6 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const matchedStateId = useMemo(() => {
-    const match = DUMMY_STATES.find((state) => state.name === stateName);
-    return match?.id ?? null;
-  }, [stateName]);
-
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
@@ -32,12 +26,30 @@ export default function SignupPage() {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = cred.user;
 
+      let resolvedStateId = null;
+      if (role === "state") {
+        const { data: stateRow, error: stateError } = await supabase
+          .from("states")
+          .select("id")
+          .eq("name", stateName)
+          .maybeSingle();
+
+        if (stateError) {
+          throw stateError;
+        }
+        if (!stateRow?.id) {
+          throw new Error("Selected state is not available in database.");
+        }
+
+        resolvedStateId = stateRow.id;
+      }
+
       const profilePayload = {
         firebase_uid: firebaseUser.uid,
         email,
         role,
         state_name: role === "state" ? stateName : null,
-        state_id: role === "state" ? matchedStateId : null,
+        state_id: role === "state" ? resolvedStateId : null,
       };
 
       const { error: profileError } = await supabase
