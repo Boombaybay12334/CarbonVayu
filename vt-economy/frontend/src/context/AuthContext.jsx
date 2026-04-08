@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { supabase } from "../lib/supabase";
@@ -41,6 +41,32 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const loadOrRecoverProfile = useCallback(async (firebaseUser) => {
+    return fetchProfileWithRetry(firebaseUser.uid);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser) {
+      setUser(null);
+      setProfile(null);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const loadedProfile = await loadOrRecoverProfile(firebaseUser);
+      setUser(firebaseUser);
+      setProfile(loadedProfile ?? null);
+    } catch (error) {
+      console.error("Failed to refresh user profile", error);
+      setUser(firebaseUser);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [loadOrRecoverProfile]);
+
   useEffect(() => {
     let isActive = true;
     let latestRequestId = 0;
@@ -55,7 +81,7 @@ export function AuthProvider({ children }) {
 
       try {
         if (firebaseUser) {
-          const loadedProfile = await fetchProfileWithRetry(firebaseUser.uid);
+          const loadedProfile = await loadOrRecoverProfile(firebaseUser);
 
           if (isActive && requestId === latestRequestId) {
             setUser(firebaseUser);
@@ -84,12 +110,12 @@ export function AuthProvider({ children }) {
       isActive = false;
       unsub();
     };
-  }, []);
+  }, [loadOrRecoverProfile]);
 
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

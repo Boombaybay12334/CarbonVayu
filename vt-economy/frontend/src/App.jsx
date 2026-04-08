@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, Outlet } from "react-router-dom";
+import { Navigate, Route, Routes, Outlet, useLocation } from "react-router-dom";
 
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import { useAuth } from "./context/AuthContext";
@@ -7,6 +7,7 @@ import Navbar from "./components/layout/Navbar";
 
 import AdminHome from "./pages/admin/AdminHome";
 import LoginPage from "./pages/auth/LoginPage";
+import ProfileRecoveryPage from "./pages/auth/ProfileRecoveryPage";
 import SignupPage from "./pages/auth/SignupPage";
 import CommonManHome from "./pages/common-man/CommonManHome";
 import ExploreVTPage from "./pages/common-man/ExploreVTPage";
@@ -23,16 +24,7 @@ function RoleHome() {
   const { profile, loading } = useAuth();
 
   if (loading) return <LoadingSpinner />;
-  if (!profile) {
-    return (
-      <section className="rounded-2xl border border-amber-500/40 bg-amber-950/20 p-6 text-amber-100">
-        <h1 className="text-xl font-semibold">We could not finish loading your profile</h1>
-        <p className="mt-2 text-sm text-amber-200/90">
-          This can happen right after account creation. Please refresh once. If it still appears, log out and sign in again.
-        </p>
-      </section>
-    );
-  }
+  if (!profile) return <Navigate to="/app/complete-profile" replace />;
   if (profile.role === "state") return <StateHome />;
   if (profile.role === "admin") return <AdminHome />;
   return <CommonManHome />;
@@ -40,9 +32,20 @@ function RoleHome() {
 
 /* 🔥 NAVBAR LAYOUT */
 function AppLayout() {
-  const { user } = useAuth();
+  const location = useLocation();
+  const { user, profile, loading } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
 
   if (!user) return <Navigate to="/login" replace />;
+
+  const isProfileCompletionRoute = location.pathname === "/app/complete-profile";
+  if (!profile && !isProfileCompletionRoute) {
+    return <Navigate to="/app/complete-profile" replace />;
+  }
+  if (profile && isProfileCompletionRoute) {
+    return <Navigate to="/app/home" replace />;
+  }
 
   return (
     <div className="min-h-screen text-slate-200">
@@ -67,6 +70,7 @@ export default function App() {
 
       {/* ALL APP ROUTES */}
       <Route path="/app" element={<AppLayout />}>
+        <Route path="complete-profile" element={<ProfileRecoveryPage />} />
         <Route path="home" element={<RoleHome />} />
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route path="explore" element={<ExploreVTPage />} />
