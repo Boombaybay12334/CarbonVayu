@@ -36,37 +36,12 @@ async function fetchProfileWithRetry(firebaseUid) {
   return null;
 }
 
-async function ensureProfileExists(firebaseUser) {
-  const fallbackProfile = {
-    firebase_uid: firebaseUser.uid,
-    email: firebaseUser.email ?? "",
-    role: "common_man",
-    state_name: null,
-    state_id: null,
-  };
-
-  const { error } = await supabase
-    .from("user_profiles")
-    .upsert(fallbackProfile, { onConflict: "firebase_uid", ignoreDuplicates: true });
-
-  if (error) {
-    throw error;
-  }
-}
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const loadOrRecoverProfile = useCallback(async (firebaseUser) => {
-    const loadedProfile = await fetchProfileWithRetry(firebaseUser.uid);
-    if (loadedProfile) {
-      return loadedProfile;
-    }
-
-    // Self-heal legacy accounts that were created without a profile row.
-    await ensureProfileExists(firebaseUser);
     return fetchProfileWithRetry(firebaseUser.uid);
   }, []);
 
