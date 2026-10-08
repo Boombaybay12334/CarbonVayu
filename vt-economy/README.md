@@ -45,3 +45,6 @@ See [docs/SUPABASE_SCHEMA.md](docs/SUPABASE_SCHEMA.md).
   - Replace one service function at a time with a real Supabase query
   - Verify corresponding page renders without errors
   - Update `docs/DUMMY_DATA_GUIDE.md` and `docs/API_REFERENCE.md`
+
+
+OH CAPTAIN MY CAPTAIN
