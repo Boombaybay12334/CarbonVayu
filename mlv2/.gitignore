@@ -1,0 +1,28 @@
+# Secrets & credentials
+.env
+
+# Python & virtual environments
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Raw data directories (large NetCDF / GeoPackage / gzipped archives)
+edgar_v81/
+era5/
+gadm/
+openaq/raw/
+firms/
+
+# Large processed artifacts (keep small CSVs like data/node_list.csv)
+data/*.parquet
+data/*.npz
+results/*.parquet
+
+# OS & editor files
+.DS_Store
+*.swp
+.vscode/.env
+.env
