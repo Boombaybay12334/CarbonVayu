@@ -1,0 +1,13 @@
+numpy
+pandas
+openpyxl
+xlrd
+xarray
+netCDF4
+geopandas
+rioxarray
+cdsapi
+pdfplumber
+python-dotenv
+requests
+boto3

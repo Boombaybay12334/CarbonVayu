@@ -1,0 +1,7 @@
+comparison,subset,dRMSE,ci_low,ci_high,verdict
+D2 vs D  (GATE C2: 72h nodes vs crude upwind),all,2.1474300955633794,1.878698545840188,2.3625653261647455,better
+D2 vs D  (GATE C2: 72h nodes vs crude upwind),north_box,3.582350171472733,3.213051489044031,3.9295363922312827,better
+D2 vs D  (GATE C2: 72h nodes vs crude upwind),delhi_OctNov,5.6828870050439555,1.8336408880439274,11.122172808334664,better
+D2 vs C  (72h nodes vs local only),all,2.2739207315837646,1.975576114892979,2.537297284313459,better
+D2 vs C  (72h nodes vs local only),north_box,3.8358828052589757,3.40856334286529,4.265408656821223,better
+D2 vs C  (72h nodes vs local only),delhi_OctNov,7.654880683455925,3.0161345672787663,13.307025552772725,better
