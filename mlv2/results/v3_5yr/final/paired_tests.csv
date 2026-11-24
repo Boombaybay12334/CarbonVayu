@@ -1,0 +1,25 @@
+test,meaning,subset,dRMSE,ci_low,ci_high,verdict
+B vs P1,real exposures vs trajectories from another year,all,0.5233432390085753,0.3347202593630028,0.6941023823553342,A better
+B vs P1,real exposures vs trajectories from another year,north_box,0.7683738776997515,0.5000225723712279,0.9959647914357219,A better
+B vs P1,real exposures vs trajectories from another year,delhi_OctNov,2.9773440719765745,1.6991143453237485,4.131412106397601,A better
+B vs P2,real vs shuffled node emissions,all,0.6222761296287729,0.3309523221149296,0.835902325559842,A better
+B vs P2,real vs shuffled node emissions,north_box,0.833831776161567,0.41513829594949153,1.1288093861885888,A better
+B vs P2,real vs shuffled node emissions,delhi_OctNov,3.984314127216706,2.289237588673552,5.12968796621397,A better
+B vs P3,real vs residence-time-only,all,0.5419649007756604,0.2807533194238319,0.7260820221000676,A better
+B vs P3,real vs residence-time-only,north_box,0.6774075252410583,0.2974555912767478,0.9402091890720816,A better
+B vs P3,real vs residence-time-only,delhi_OctNov,3.438730375594119,1.9113195617487733,4.497633113373721,A better
+B vs M,cost of forcing monotone decay,all,0.06461245587530584,0.010888892816570284,0.11589140861942493,A better
+B vs M,cost of forcing monotone decay,north_box,0.08644408690224736,0.019734360264587282,0.14888060177827883,A better
+B vs M,cost of forcing monotone decay,delhi_OctNov,0.5600695212342259,0.25590859553817574,0.8746020513291687,A better
+X vs B,excluding the receptor's own node,all,0.05131838834044089,-0.006350752661136826,0.10539079852061607,not distinguishable
+X vs B,excluding the receptor's own node,north_box,0.018301427726768793,-0.05357465050726411,0.09074973715933997,not distinguishable
+X vs B,excluding the receptor's own node,delhi_OctNov,0.4571865315652417,0.1773650831233006,0.7143554618500285,A better
+R1 vs R0,KEY: emissions beyond flow regime (9 nuisance cols),all,0.6012395213192008,0.3152252558032757,0.813918002659075,A better
+R1 vs R0,KEY: emissions beyond flow regime (9 nuisance cols),north_box,0.7328651392721213,0.31404861060068473,1.0216893778966312,A better
+R1 vs R0,KEY: emissions beyond flow regime (9 nuisance cols),delhi_OctNov,3.7117766957416336,2.057744258826156,4.877167152740896,A better
+R2 vs R0b,KEY: emissions beyond flow regime (node-level nuisance),all,0.0496776365074183,0.005305508909819956,0.08588892599607491,A better
+R2 vs R0b,KEY: emissions beyond flow regime (node-level nuisance),north_box,0.07035113612834465,0.015467882595319794,0.11903423507378239,A better
+R2 vs R0b,KEY: emissions beyond flow regime (node-level nuisance),delhi_OctNov,0.38001384346402745,0.1997398389120754,0.5909005184437486,A better
+B vs C,baseline gain over Stage 1 (reference),all,1.3856196369933471,0.8549443333106332,1.7882019718494124,A better
+B vs C,baseline gain over Stage 1 (reference),north_box,2.0390328574352665,1.3513583415079151,2.549827495843874,A better
+B vs C,baseline gain over Stage 1 (reference),delhi_OctNov,7.120772137523147,4.292238874470557,8.868744074334817,A better
