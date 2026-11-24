@@ -1,66 +1,64 @@
 import { supabase } from "../lib/supabase";
-import { DUMMY_STATES } from "../dummy/dummyData";
-
-const EXTRA_NAMES = [
-  "Uttar Pradesh", "Maharashtra", "Bihar", "West Bengal", "Madhya Pradesh", "Tamil Nadu", 
-  "Rajasthan", "Karnataka", "Gujarat", "Andhra Pradesh", "Odisha", "Telangana", 
-  "Kerala", "Jharkhand", "Assam", "Punjab", "Chhattisgarh", "Haryana", 
-  "Delhi", "Jammu and Kashmir", "Uttarakhand", "Himachal Pradesh", "Tripura", 
-  "Meghalaya", "Manipur", "Nagaland", "Goa", "Arunachal Pradesh", "Mizoram", "Sikkim"
-];
-
-function padToTwentyNine(rows) {
-  // Fix: DB doesn't have a yoy_delta column. Generate deterministic values if missing.
-  const padded = rows.map((row, index) => {
-    let delta = row.yoy_delta;
-    if (typeof delta !== "number") {
-      const factor = (index % 3 === 0) ? -0.8 : 1.2;
-      delta = Math.round((row.vt_balance || 500) * 0.05 * factor);
-    }
-    return { ...row, yoy_delta: delta };
-  });
-
-  let nextRank = padded.length + 1;
-
-  for (const name of EXTRA_NAMES) {
-    if (padded.length >= 29) break;
-    // Don't add if already exists in DB
-    if (padded.some(r => r.name.toLowerCase() === name.toLowerCase())) continue;
-    
-    padded.push({
-      id: `extra-${name}`,
-      rank: nextRank,
-      name,
-      vt_balance: Math.max(200, 3100 - nextRank * 60),
-      yoy_delta: nextRank % 2 === 0 ? 40 - nextRank : -30 - nextRank,
-      archetype: "Standard Simulation",
-    });
-    nextRank += 1;
-  }
-
-  return padded;
-}
 
 export async function getAllStates() {
-  const { data, error } = await supabase
-    .from("states")
-    .select("*")
-    .order("vt_balance", { ascending: false });
-  
-  if (error) throw error;
-  
-  // Globally ensure 29 state data points for all components
-  return padToTwentyNine(data || []);
+  const [statesRes, historyRes] = await Promise.all([
+    supabase
+      .from("states")
+      .select("*")
+      .order("rank", { ascending: true }),
+    supabase
+      .from("vt_history")
+      .select("state_id, year, vt_score, note")
+      .in("year", [2022, 2023]),
+  ]);
+
+  if (statesRes.error) throw statesRes.error;
+  const states = statesRes.data || [];
+  const history = historyRes.data || [];
+
+  // Map history by state_id to calculate real YoY delta and parse 95% CIs
+  const histMap = {};
+  for (const h of history) {
+    if (!histMap[h.state_id]) histMap[h.state_id] = {};
+    histMap[h.state_id][h.year] = h.vt_score;
+    if (h.year === 2023 && h.note) {
+      // Note format contains: "...; 95% CI=[521.8, 545.7]"
+      const match = h.note.match(/95% CI=\[([\d.]+),\s*([\d.]+)\]/);
+      if (match) {
+        histMap[h.state_id].ci_low = parseFloat(match[1]);
+        histMap[h.state_id].ci_high = parseFloat(match[2]);
+      }
+    }
+  }
+
+  return states.map((s) => {
+    const h = histMap[s.id] || {};
+    let yoy_delta = 0;
+    if (h[2023] != null && h[2022] != null) {
+      yoy_delta = Math.round((Number(h[2023]) - Number(h[2022])) * 100) / 100;
+    } else {
+      yoy_delta = 0;
+    }
+
+    return {
+      ...s,
+      yoy_delta,
+      vt_ci_low: h.ci_low ?? null,
+      vt_ci_high: h.ci_high ?? null,
+      is_modeled: (s.rank <= 22),
+    };
+  });
 }
 
 export async function getTopStates(n = 5) {
   const all = await getAllStates();
-  return all.slice(0, n);
+  return all.filter((s) => s.is_modeled).slice(0, n);
 }
 
 export async function getBottomStates(n = 5) {
   const all = await getAllStates();
-  return [...all].sort((a, b) => a.vt_balance - b.vt_balance).slice(0, n);
+  const modeled = all.filter((s) => s.is_modeled);
+  return [...modeled].sort((a, b) => a.vt_balance - b.vt_balance).slice(0, n);
 }
 
 export async function getNationalTimeseries() {
@@ -74,18 +72,19 @@ export async function getNationalTimeseries() {
   }
 
   const yearMap = {};
-  data.forEach((row) => {
+  (data || []).forEach((row) => {
+    if (!row.year) return;
     if (!yearMap[row.year]) {
       yearMap[row.year] = { year: row.year, total: 0, count: 0 };
     }
-    yearMap[row.year].total += row.vt_score || 0;
+    yearMap[row.year].total += Number(row.vt_score) || 0;
     yearMap[row.year].count += 1;
   });
 
   return Object.values(yearMap)
     .map((yd) => ({
       year: yd.year,
-      vt_score: Math.round(yd.total / yd.count)
+      vt_score: Math.round(yd.total / (yd.count || 1)),
     }))
     .sort((a, b) => a.year - b.year);
 }

@@ -4,14 +4,20 @@ import { supabase } from "../../lib/supabase";
 
 // ─── Name normaliser: map DB names → GeoJSON property names ──────────────────
 const STATE_NAME_MAP = {
-  "Andaman and Nicobar Islands": "Andaman & Nicobar Island",
-  "Andaman & Nicobar Islands": "Andaman & Nicobar Island",
-  "Jammu and Kashmir": "Jammu & Kashmir",
-  "Dadra and Nagar Haveli": "Dadra & Nagar Haveli",
-  "Dadra and Nagar Haveli and Daman and Diu": "Daman & Diu",
-  "Delhi": "NCT of Delhi",
-  "Uttarakhand": "Uttarakhand",
-  "Odisha": "Odisha",
+  "Andaman and Nicobar Islands": "Andaman and Nicobar",
+  "Jammu and Kashmir": "Jammu and Kashmir",
+  "Dadra and Nagar Haveli": "Dadra and Nagar Haveli",
+  "Dadra and Nagar Haveli and Daman and Diu": "Daman and Diu",
+  "Delhi": "Delhi",
+  "Uttarakhand": "Uttaranchal",
+  "Odisha": "Orissa",
+  "Chandigarh": "Chandigarh",
+  "Puducherry": "Puducherry",
+};
+
+// Fallback lon/lat for states without distinct polygon in legacy base map
+const FALLBACK_CENTROIDS = {
+  "Telangana": [79.0193, 18.1124],
 };
 
 function normalise(name) {
@@ -40,6 +46,8 @@ function arcPath(sx, sy, tx, ty, sag = 0.25) {
 function periodScore(period) {
   const text = String(period ?? "").trim();
   if (!text) return Number.NEGATIVE_INFINITY;
+
+  if (text === "2023-v3" || text.includes("v3")) return 20231231;
 
   const parsedDate = Date.parse(text);
   if (!Number.isNaN(parsedDate)) return parsedDate;
@@ -312,6 +320,16 @@ export default function IndiaMapFlowChart() {
           if (dbState) {
             const c = path.centroid(f);
             if (!isNaN(c[0])) stateCentroid.set(String(dbState.id), c);
+          }
+        });
+
+        // Set fallback centroids for any states without distinct base map polygons (e.g. Telangana)
+        states.forEach((s) => {
+          if (!stateCentroid.has(String(s.id)) && FALLBACK_CENTROIDS[s.name]) {
+            const projected = projection(FALLBACK_CENTROIDS[s.name]);
+            if (projected && !isNaN(projected[0])) {
+              stateCentroid.set(String(s.id), projected);
+            }
           }
         });
 

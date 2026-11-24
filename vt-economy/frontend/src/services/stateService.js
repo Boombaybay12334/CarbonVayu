@@ -1,8 +1,6 @@
 import { supabase } from "../lib/supabase";
-import { DUMMY_STATES, DUMMY_TIMESERIES, DUMMY_RELATIONS } from "../dummy/dummyData";
 
 export async function getStateByName(name) {
-  // TODO: Replace with Supabase query
   const { data, error } = await supabase
     .from("states")
     .select("*")
@@ -10,22 +8,20 @@ export async function getStateByName(name) {
     .single();
   if (error) throw error;
   return data;
-  //return DUMMY_STATES.find((state) => state.name === name) || DUMMY_STATES[6]; // DUMMY DATA - replace with Supabase query
 }
 
-export async function getStateTimeseries(stateId, stateName) {
-   const { data, error } = await supabase
-     .from("vt_history")
-     .select("*")
-     .eq("state_id", stateId)
-     .order("year");
-   if (error) throw error;
-   return data;
-  // return DUMMY_TIMESERIES[stateName] || DUMMY_TIMESERIES.Karnataka; // DUMMY DATA - replace with Supabase query
-}
-
-export async function getStateRelations(stateId) {
+export async function getStateTimeseries(stateId) {
   const { data, error } = await supabase
+    .from("vt_history")
+    .select("*")
+    .eq("state_id", stateId)
+    .order("year", { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function getStateRelations(stateId, period = "2023-v3") {
+  let query = supabase
     .from("carbon_relations")
     .select(`
       *,
@@ -34,24 +30,33 @@ export async function getStateRelations(stateId) {
     `)
     .or(`source_state_id.eq.${stateId},target_state_id.eq.${stateId}`);
 
+  if (period) {
+    query = query.eq("period", period);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
 
-  const affected_by = data
+  const rows = data || [];
+
+  const affected_by = rows
     .filter((rel) => rel.target_state_id === stateId)
     .map((rel) => ({
       state: rel.source_state?.name || "Unknown",
-      type: rel.relation_type || "Unknown relation",
-      vt_impact: rel.vt_impact || 0,
+      type: rel.relation_type || "transport",
+      vt_impact: Number(rel.vt_impact) || 0,
       status: rel.status || "neutral",
+      period: rel.period,
     }));
 
-  const affecting = data
+  const affecting = rows
     .filter((rel) => rel.source_state_id === stateId)
     .map((rel) => ({
       state: rel.target_state?.name || "Unknown",
-      type: rel.relation_type || "Unknown relation",
-      vt_impact: rel.vt_impact || 0,
+      type: rel.relation_type || "transport",
+      vt_impact: Number(rel.vt_impact) || 0,
       status: rel.status || "neutral",
+      period: rel.period,
     }));
 
   return { affected_by, affecting };

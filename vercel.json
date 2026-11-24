@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd vt-economy/frontend && npm run build",
+  "outputDirectory": "vt-economy/frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

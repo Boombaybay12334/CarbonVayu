@@ -16,8 +16,9 @@ function getBarColor(score) {
 }
 
 export default function StateBarChart({ data = [], title = "" }) {
-  // Render up to 29 states
-  const chartData = data.slice(0, 29);
+  // Render the 22 validated modeled states
+  const modeled = data.filter((s) => s.rank != null && s.rank <= 22);
+  const chartData = modeled.length > 0 ? modeled : data.slice(0, 22);
   
   // Calculate a dynamic height so the chart stretches properly and is cleanly scrollable
   const rowHeight = 34; // px per state row

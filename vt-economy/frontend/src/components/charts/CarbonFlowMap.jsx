@@ -393,7 +393,8 @@ export default function CarbonFlowMap() {
           supabase.from("states").select("id, name, vt_balance, archetype, rank"),
           supabase
             .from("carbon_relations")
-            .select("id, source_state_id, target_state_id, relation_type, vt_impact, status, period"),
+            .select("id, source_state_id, target_state_id, relation_type, vt_impact, status, period")
+            .eq("period", "2023-v3"),
         ]);
 
         if (statesRes.error) throw statesRes.error;

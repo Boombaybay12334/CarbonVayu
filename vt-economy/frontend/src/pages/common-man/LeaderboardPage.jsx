@@ -53,7 +53,7 @@ export default function LeaderboardPage() {
             National VT Leaderboard
           </h1>
           <p className="text-slate-400 mt-2 text-lg max-w-2xl">
-            Rankings based on state-level climate contributions, carbon sink management, and cumulative Vaayu Token balances.
+            Rankings driven by validated 5-year Monotone-Decay PM2.5 transport attribution, accountable air quality burden, and cumulative Vaayu Token balances.
           </p>
         </div>
       </div>
@@ -77,10 +77,14 @@ export default function LeaderboardPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <div className="text-xs text-slate-400 flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+            <span>22 Validated Modeled States (Period: 2023-v3)</span>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="max-h-[500px] overflow-y-auto overflow-x-auto custom-scrollbar rounded-xl border border-white/5 bg-slate-900/30 backdrop-blur-sm relative z-10">
+        <div className="max-h-[550px] overflow-y-auto overflow-x-auto custom-scrollbar rounded-xl border border-white/5 bg-slate-900/30 backdrop-blur-sm relative z-10">
           {loading ? (
             <div className="flex justify-center items-center h-64">
                <div className="w-8 h-8 flex gap-1">
@@ -90,7 +94,7 @@ export default function LeaderboardPage() {
                 </div>
             </div>
           ) : (
-            <table className="w-full text-left min-w-[700px]">
+            <table className="w-full text-left min-w-[760px]">
               <thead className="bg-slate-800/80 backdrop-blur-md sticky top-0 z-20">
                 <tr className="text-slate-300 border-b border-white/10 uppercase text-xs tracking-wider font-semibold">
                   <th className="p-4 cursor-pointer hover:text-white transition-colors group" onClick={() => toggleSort("rank")}>
@@ -115,12 +119,28 @@ export default function LeaderboardPage() {
                 {filtered.map((row) => (
                   <tr key={row.id} className="hover:bg-white/5 transition-colors group">
                     <td className="p-4 font-display font-semibold">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 border border-white/10 group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                      <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full border transition-colors ${
+                        row.is_modeled
+                          ? "bg-slate-800 border-white/10 group-hover:border-primary/50 group-hover:text-primary"
+                          : "bg-slate-900 border-white/5 text-slate-500"
+                      }`}>
                         {row.rank}
                       </span>
                     </td>
-                    <td className="p-4 font-medium text-slate-200">{row.name}</td>
-                    <td className="p-4 font-display text-lg tracking-tight">{(Number(row.vt_balance) || 0).toLocaleString()}</td>
+                    <td className="p-4 font-medium text-slate-200">
+                      {row.name}
+                      {!row.is_modeled && (
+                        <span className="ml-2 text-[10px] text-slate-500 italic">Unmonitored</span>
+                      )}
+                    </td>
+                    <td className="p-4 font-display tracking-tight">
+                      <span className="text-lg font-bold">{(Number(row.vt_balance) || 0).toLocaleString()}</span>
+                      {row.vt_ci_low != null && row.vt_ci_high != null && (
+                        <span className="block text-[11px] font-sans font-normal text-slate-400">
+                          95% CI: [{row.vt_ci_low} – {row.vt_ci_high}]
+                        </span>
+                      )}
+                    </td>
                     <td className={`p-4 font-medium flex items-center gap-1 ${row.yoy_delta >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
                       {row.yoy_delta >= 0 ? (
                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
@@ -131,7 +151,7 @@ export default function LeaderboardPage() {
                     </td>
                     <td className="p-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                        {row.archetype || "Standard"}
+                        {row.archetype === "F" ? "Forest (F)" : row.archetype === "I" ? "Industrial (I)" : row.archetype === "M" ? "Mixed (M)" : (row.archetype || "Standard")}
                       </span>
                     </td>
                   </tr>
