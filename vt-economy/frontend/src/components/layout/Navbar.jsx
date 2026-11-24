@@ -12,6 +12,7 @@ export default function Navbar() {
 
   const items = [
     { name: "Home", path: "/app/home" },
+    { name: "VT v5 Engine", path: "/app/v5-analytics", badge: "v5" },
     { name: "Explore", path: "/app/explore" },
     { name: "National Visuals", path: "/app/national-visuals" },
     { name: "Leaderboard", path: "/app/leaderboard" },
@@ -47,13 +48,18 @@ export default function Navbar() {
               <div
                 key={item.name}
                 onClick={() => navigate(item.path)}
-                className={`cursor-pointer transition-all duration-300 relative group py-2 ${
+                className={`cursor-pointer transition-all duration-300 relative group py-2 flex items-center gap-1.5 ${
                   isActive
                     ? "text-white font-semibold"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
                 <span className="relative z-10">{item.name}</span>
+                {item.badge && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+                    {item.badge}
+                  </span>
+                )}
                 
                 {isActive ? (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>

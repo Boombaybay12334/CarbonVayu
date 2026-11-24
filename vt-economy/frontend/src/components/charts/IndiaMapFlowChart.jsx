@@ -47,6 +47,7 @@ function periodScore(period) {
   const text = String(period ?? "").trim();
   if (!text) return Number.NEGATIVE_INFINITY;
 
+  if (text === "2023-v5" || text.includes("v5")) return 20251231;
   if (text === "2023-v3" || text.includes("v3")) return 20231231;
 
   const parsedDate = Date.parse(text);
@@ -366,11 +367,32 @@ export default function IndiaMapFlowChart() {
           .attr("stroke", (d) => (d.relation_type === "fine" ? FINE_COLOR : TRANSPORT_COLOR))
           .attr("stroke-width", (d) => {
             const abs = Math.abs(Number(d.vt_impact) || 0);
-            return Math.max(0.5, Math.min(3, Math.log1p(abs) * 0.5));
+            return Math.max(0.75, Math.min(3.5, Math.log1p(abs) * 0.6));
           })
           .attr("stroke-dasharray", (d) => (d.relation_type === "fine" ? "5 4" : "0"))
-          .attr("opacity", 0.55)
-          .attr("marker-end", "url(#india-map-arrow)");
+          .attr("opacity", 0.65)
+          .attr("marker-end", "url(#india-map-arrow)")
+          .style("cursor", "pointer")
+          .on("mousemove", (event, d) => {
+            const rect = container.getBoundingClientRect();
+            const fromName = states.find((s) => String(s.id) === String(d.source_state_id))?.name || "State A";
+            const toName = states.find((s) => String(s.id) === String(d.target_state_id))?.name || "State B";
+            const isFine = d.relation_type === "fine";
+            setTooltip({
+              visible: true,
+              x: event.clientX - rect.left + 12,
+              y: event.clientY - rect.top - 12,
+              content: {
+                name: `${fromName} → ${toName}`,
+                vt: `${Number(d.vt_impact || 0).toFixed(2)} ${isFine ? "VT points" : "µg/m³"}`,
+                archetype: isFine ? "CSAPR-Gated Fine Corridor" : "Atmospheric Transport Arc",
+                rank: isFine ? "Pending Settlement" : "Net Flow",
+              },
+            });
+          })
+          .on("mouseleave", () => {
+            setTooltip({ visible: false, x: 0, y: 0, content: null });
+          });
 
         arcSelRef.current = arcSel;
 

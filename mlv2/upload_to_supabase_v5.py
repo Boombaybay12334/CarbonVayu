@@ -78,6 +78,7 @@ def main():
         st_name = str(r["state"])
         full_payload = {
             "name": st_name,
+            "vt_balance": round(float(r["vt_settled"]), 2),
             "vt_score": round(float(r["vt_settled"]), 2),
             "vt_base": round(float(r["vt_base"]), 2),
             "vt_settled": round(float(r["vt_settled"]), 2),
@@ -125,6 +126,7 @@ def main():
             "vt_base": round(float(r["vt_base"]), 2),
             "vt_ci_low": round(float(r["vt_ci_low"]), 2),
             "vt_ci_high": round(float(r["vt_ci_high"]), 2),
+            "note": f"v5 settled; 95% CI=[{float(r['vt_ci_low']):.1f}, {float(r['vt_ci_high']):.1f}]",
             "rank": int(r["rank"]),
         }, hist_cols)
         hist_rows.append(h_row)
@@ -154,6 +156,8 @@ def main():
                 "to_state": str(c["claimant"]),
                 "relation_type": "fine",
                 "type": "fine",
+                "vt_impact": round(float(c["fine_vt_points"]), 2),
+                "status": "fine_pending",
                 "amount": round(float(c["fine_vt_points"]), 2),
                 "harm_ugm3": round(float(c["harm_ugm3"]), 3),
                 "confidence": round(float(c["confidence"]), 3),
@@ -177,6 +181,8 @@ def main():
                 "to_state": vic,
                 "relation_type": "transport",
                 "type": "transport",
+                "vt_impact": round(float(n["net_harm_ugm3"]), 3),
+                "status": "gain",
                 "amount": round(float(n["net_harm_ugm3"]), 3),
                 "harm_ugm3": round(float(n["net_harm_ugm3"]), 3),
                 "confidence": round(conf, 3),

@@ -20,7 +20,7 @@ export async function getStateTimeseries(stateId) {
   return data;
 }
 
-export async function getStateRelations(stateId, period = "2023-v3") {
+export async function getStateRelations(stateId, period = "2023-v5") {
   let query = supabase
     .from("carbon_relations")
     .select(`
@@ -37,7 +37,22 @@ export async function getStateRelations(stateId, period = "2023-v3") {
   const { data, error } = await query;
   if (error) throw error;
 
-  const rows = data || [];
+  let rows = data || [];
+  if (!rows.length && period === "2023-v5") {
+    // Fallback to 2023-v3 if 2023-v5 has no relation records
+    const fallbackRes = await supabase
+      .from("carbon_relations")
+      .select(`
+        *,
+        source_state:states!source_state_id(name),
+        target_state:states!target_state_id(name)
+      `)
+      .or(`source_state_id.eq.${stateId},target_state_id.eq.${stateId}`)
+      .eq("period", "2023-v3");
+    if (!fallbackRes.error && fallbackRes.data?.length) {
+      rows = fallbackRes.data;
+    }
+  }
 
   const affected_by = rows
     .filter((rel) => rel.target_state_id === stateId)

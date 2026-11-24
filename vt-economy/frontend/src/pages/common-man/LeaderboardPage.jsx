@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { getAllStates } from "../../services/leaderboardService";
+import { Sparkles, ArrowRight } from "lucide-react";
 
 export default function LeaderboardPage() {
   const [states, setStates] = useState([]);
@@ -56,6 +58,16 @@ export default function LeaderboardPage() {
             Rankings driven by validated 5-year Monotone-Decay PM2.5 transport attribution, accountable air quality burden, and cumulative Vaayu Token balances.
           </p>
         </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <Link
+            to="/app/v5-analytics"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 text-emerald-300 hover:text-white hover:border-emerald-400 transition-all text-sm font-medium shadow-lg hover:shadow-emerald-500/10"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span>Explore VT v5 Analytics Engine</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
 
       <section className="glass-panel rounded-2xl p-6 relative overflow-hidden animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -78,8 +90,8 @@ export default function LeaderboardPage() {
             />
           </div>
           <div className="text-xs text-slate-400 flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
-            <span>22 Validated Modeled States (Period: 2023-v3)</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+            <span className="font-medium text-slate-300">22 Validated Modeled States (Period: 2023-v5)</span>
           </div>
         </div>
 
@@ -134,9 +146,9 @@ export default function LeaderboardPage() {
                       )}
                     </td>
                     <td className="p-4 font-display tracking-tight">
-                      <span className="text-lg font-bold">{(Number(row.vt_balance) || 0).toLocaleString()}</span>
+                      <span className="text-lg font-bold text-white">{(Number(row.vt_balance) || 0).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 })}</span>
                       {row.vt_ci_low != null && row.vt_ci_high != null && (
-                        <span className="block text-[11px] font-sans font-normal text-slate-400">
+                        <span className="block text-[11px] font-mono text-emerald-400 font-medium">
                           95% CI: [{row.vt_ci_low} – {row.vt_ci_high}]
                         </span>
                       )}

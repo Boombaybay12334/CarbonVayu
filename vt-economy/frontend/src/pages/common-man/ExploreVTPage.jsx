@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Sparkles, ArrowRight, Activity, ShieldCheck } from "lucide-react";
 
 export default function ExploreVTPage() {
   const navigate = useNavigate();
@@ -15,6 +16,31 @@ export default function ExploreVTPage() {
           A complete breakdown of how carbon accountability is measured,
           distributed, and enforced across Indian states.
         </p>
+
+        {/* VT v5 Callout Banner */}
+        <div className="mt-8 p-4 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-cyan-500/10 to-transparent border border-emerald-500/30 text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0">
+              <Sparkles className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-white font-display font-bold text-sm">VT v5 Engine Released</span>
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v5.0 Frozen</span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Featuring the 55/30/15 tri-pillar design, 22×22 transport matrix, and 10 CSAPR-gated fine corridors.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/app/v5-analytics"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xs font-semibold hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+          >
+            <span>Explore VT v5</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </section>
 
       {/* PROBLEM */}

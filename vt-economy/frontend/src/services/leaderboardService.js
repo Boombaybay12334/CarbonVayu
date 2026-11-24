@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabase";
 
 export async function getAllStates() {
-  const [statesRes, historyRes] = await Promise.all([
+  const [statesRes, historyRes, bundleRes] = await Promise.allSettled([
     supabase
       .from("states")
       .select("*")
@@ -10,11 +10,22 @@ export async function getAllStates() {
       .from("vt_history")
       .select("state_id, year, vt_score, note")
       .in("year", [2022, 2023]),
+    fetch("/v5/vt_v5_bundle.json").then((r) => (r.ok ? r.json() : null)),
   ]);
 
-  if (statesRes.error) throw statesRes.error;
-  const states = statesRes.data || [];
-  const history = historyRes.data || [];
+  if (statesRes.status === "rejected" || statesRes.value.error) {
+    throw statesRes.value?.error || new Error("Failed to load states");
+  }
+  const states = statesRes.value.data || [];
+  const history = historyRes.status === "fulfilled" && !historyRes.value.error ? historyRes.value.data || [] : [];
+  const bundle = bundleRes.status === "fulfilled" ? bundleRes.value : null;
+
+  const bundleMap = {};
+  if (bundle?.leaderboard) {
+    bundle.leaderboard.forEach((b) => {
+      bundleMap[b.state.toLowerCase()] = b;
+    });
+  }
 
   // Map history by state_id to calculate real YoY delta and parse 95% CIs
   const histMap = {};
@@ -33,6 +44,7 @@ export async function getAllStates() {
 
   return states.map((s) => {
     const h = histMap[s.id] || {};
+    const b = bundleMap[s.name?.toLowerCase()] || {};
     let yoy_delta = 0;
     if (h[2023] != null && h[2022] != null) {
       yoy_delta = Math.round((Number(h[2023]) - Number(h[2022])) * 100) / 100;
@@ -40,12 +52,22 @@ export async function getAllStates() {
       yoy_delta = 0;
     }
 
+    const ci_low = h.ci_low ?? (b.vt_ci_low != null ? Number(b.vt_ci_low.toFixed(1)) : null);
+    const ci_high = h.ci_high ?? (b.vt_ci_high != null ? Number(b.vt_ci_high.toFixed(1)) : null);
+    const settledScore = b.vt_settled ?? s.vt_balance;
+
     return {
       ...s,
+      vt_balance: settledScore != null ? Number(Number(settledScore).toFixed(2)) : s.vt_balance,
       yoy_delta,
-      vt_ci_low: h.ci_low ?? null,
-      vt_ci_high: h.ci_high ?? null,
-      is_modeled: (s.rank <= 22),
+      vt_ci_low: ci_low,
+      vt_ci_high: ci_high,
+      pillar_A_export: b.pillar_A_export ?? null,
+      pillar_B_progress: b.pillar_B_progress ?? null,
+      pillar_C_re: b.pillar_C_re ?? null,
+      audit_flag: b.audit_flag ?? null,
+      pm25_curr: b.pm25_curr ?? null,
+      is_modeled: s.rank <= 22,
     };
   });
 }

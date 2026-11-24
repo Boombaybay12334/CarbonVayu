@@ -18,6 +18,7 @@ import ProjectsPage from "./pages/state/ProjectsPage";
 import StateHome from "./pages/state/StateHome";
 import StateRelationsPage from "./pages/state/StateRelationsPage";
 import StateTimeseriesPage from "./pages/state/StateTimeseriesPage";
+import VtV5Analytics from "./components/VtV5Analytics";
 
 /* ROLE BASED HOME */
 function RoleHome() {
@@ -72,6 +73,8 @@ export default function App() {
       <Route path="/app" element={<AppLayout />}>
         <Route path="complete-profile" element={<ProfileRecoveryPage />} />
         <Route path="home" element={<RoleHome />} />
+        <Route path="v5-analytics" element={<VtV5Analytics />} />
+        <Route path="v5" element={<Navigate to="/app/v5-analytics" replace />} />
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route path="explore" element={<ExploreVTPage />} />
         <Route path="national-visuals" element={<NationalVisualsPage />} />

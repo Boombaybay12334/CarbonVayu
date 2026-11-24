@@ -63,6 +63,22 @@ export default function CommonManHome() {
         <p className="text-lg text-slate-400 max-w-2xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
           Track carbon accountability, cross-state pollution flow, and climate governance across India in real-time.
         </p>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+          <button
+            onClick={() => navigate("/app/v5-analytics")}
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold text-sm shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all flex items-center gap-2"
+          >
+            <span>Launch VT v5 Engine</span>
+            <span className="text-[10px] font-mono bg-white/20 px-1.5 py-0.5 rounded-full">NEW</span>
+          </button>
+          <button
+            onClick={() => navigate("/app/explore")}
+            className="px-6 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 text-sm font-medium transition-all"
+          >
+            How VT Works
+          </button>
+        </div>
       </section>
 
       {/* WHY SECTION */}

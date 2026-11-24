@@ -79,9 +79,35 @@ export default function NationalVisualsPage() {
               <span className="w-2 h-6 rounded-full bg-secondary inline-block"></span>
               State Performance Leaderboard
             </h3>
+            <div className="flex items-center rounded-xl bg-slate-900/80 border border-white/10 p-1 text-xs">
+              <button
+                onClick={() => setFilter("all")}
+                className={`px-3 py-1 rounded-lg transition-colors ${
+                  filter === "all" ? "bg-emerald-500/20 text-emerald-300 font-semibold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilter("top")}
+                className={`px-3 py-1 rounded-lg transition-colors ${
+                  filter === "top" ? "bg-emerald-500/20 text-emerald-300 font-semibold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Top 10
+              </button>
+              <button
+                onClick={() => setFilter("bottom")}
+                className={`px-3 py-1 rounded-lg transition-colors ${
+                  filter === "bottom" ? "bg-amber-500/20 text-amber-300 font-semibold" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Bottom 10
+              </button>
+            </div>
           </div>
           <div className="w-full flex-1">
-            <StateBarChart data={states} />
+            <StateBarChart data={filteredStates} />
           </div>
         </div>
       </div>

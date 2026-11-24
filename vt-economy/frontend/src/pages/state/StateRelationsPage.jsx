@@ -68,7 +68,7 @@ export default function StateRelationsPage() {
       if (!profile?.state_name) return;
       const state = await getStateByName(profile.state_name);
       if (state) {
-        const rows = await getStateRelations(state.id, "2023-v3");
+        const rows = await getStateRelations(state.id, "2023-v5");
         setRelations(rows || { affected_by: [], affecting: [] });
       }
     }
@@ -90,7 +90,7 @@ export default function StateRelationsPage() {
         <h1 className="text-4xl font-display font-bold text-white tracking-tight flex items-center gap-3">
           <Zap className="w-8 h-8 text-cyan-400" /> State Relations Ledger
         </h1>
-        <p className="text-slate-400 mt-2 text-lg">Cross-border atmospheric PM2.5 transport flows and active Vaayu Token liability claims (Period: 2023-v3).</p>
+        <p className="text-slate-400 mt-2 text-lg">Cross-border atmospheric PM2.5 transport flows and active Vaayu Token liability claims (Period: 2023-v5).</p>
       </div>
 
       {summary.count > 0 && (

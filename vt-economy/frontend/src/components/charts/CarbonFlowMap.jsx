@@ -389,19 +389,28 @@ export default function CarbonFlowMap() {
       setFetchError(null);
 
       try {
-        const [statesRes, relationsRes] = await Promise.all([
+        const [statesRes, relationsV5Res] = await Promise.all([
           supabase.from("states").select("id, name, vt_balance, archetype, rank"),
           supabase
             .from("carbon_relations")
             .select("id, source_state_id, target_state_id, relation_type, vt_impact, status, period")
-            .eq("period", "2023-v3"),
+            .eq("period", "2023-v5"),
         ]);
 
         if (statesRes.error) throw statesRes.error;
-        if (relationsRes.error) throw relationsRes.error;
-
         const states = statesRes.data || [];
-        const relations = relationsRes.data || [];
+        let relations = relationsV5Res.data || [];
+
+        // Fallback to 2023-v3 if 2023-v5 is empty
+        if (!relations.length) {
+          const relationsV3Res = await supabase
+            .from("carbon_relations")
+            .select("id, source_state_id, target_state_id, relation_type, vt_impact, status, period")
+            .eq("period", "2023-v3");
+          if (!relationsV3Res.error && relationsV3Res.data?.length) {
+            relations = relationsV3Res.data;
+          }
+        }
 
         setGraphStats({ states: states.length, relations: relations.length, links: 0 });
 
