@@ -1,0 +1,16 @@
+{
+  "version": "vt_v5_frozen_reference",
+  "reference_period": "2022-2023 (EDGAR 2019->2022 matched stations)",
+  "weights": {
+    "pillar_A_export": 0.55,
+    "pillar_B_progress": 0.15,
+    "pillar_C_re": 0.3
+  },
+  "X_MED": 0.09597795996942007,
+  "PROG_SCALE": 0.15,
+  "CENTER": 0.47025315381806343,
+  "SCALE": 0.24728271408274793,
+  "D_REF": 78.44726600888865,
+  "FINE_TO_Z": 428.7180000000001,
+  "HARM_FLOOR_UGM3": 0.4
+}
